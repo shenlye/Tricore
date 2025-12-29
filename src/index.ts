@@ -33,6 +33,13 @@ app.get('/posts', async (c) => {
 })
 
 app.post('/posts', async (c) => {
+  const adminSecretKey = c.req.header('Authorization')
+  if (adminSecretKey !== process.env.ADMIN_SECRET_KEY || !adminSecretKey) {
+    return c.json({
+      error: 'Unauthorized',
+    }, 401)
+  }
+
   try {
     const { title, content, slug } = await c.req.json()
     const result = await db.insert(posts).values({
