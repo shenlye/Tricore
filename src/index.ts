@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { drizzle } from 'drizzle-orm/bun-sqlite'
 import { posts } from './db/schema';
+import { eq } from 'drizzle-orm'
 
 const db = drizzle(process.env.DB_FILE_NAME!)
 
@@ -13,28 +14,41 @@ app.get('/', (c) => {
 app.get('/posts/:slug', async (c) => {
   const slug = c.req.param('slug')
 
-  // TODO: Fetch post from the database using Drizzle ORM
+  const result = await db.select().from(posts).where(eq(posts.slug, slug))
+
+  return c.json({
+    data: result[0],
+  })
 })
 
 app.get('/posts', async (c) => {
   const limit = 10
   const page = Number(c.req.query('page') || '1')
 
-  // TODO: Fetch paginated posts from the database using Drizzle ORM
+  const result = await db.select().from(posts).limit(limit).offset((page - 1) * limit)
+
+  return c.json({
+    data: result,
+  })
 })
 
 app.post('/posts', async (c) => {
-  const { title, content, slug } = await c.req.json()
+  try {
+    const { title, content, slug } = await c.req.json()
+    const result = await db.insert(posts).values({
+      title: title,
+      content: content,
+      slug: slug,
+    }).returning()
 
-  const result = await db.insert(posts).values({
-    title: title,
-    content: content,
-    slug: slug,
-  }).returning()
-
-  return c.json({
-    message: '文章发布成功',
-    data: result[0],
-  }, 201)
+    return c.json({
+      message: '文章发布成功',
+      data: result[0],
+    }, 201)
+  } catch (error) {
+    return c.json({
+      error: '文章发布失败',
+    }, 400)
+  }
 })
 export default app
