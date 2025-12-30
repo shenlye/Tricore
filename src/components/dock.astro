@@ -1,0 +1,132 @@
+---
+import { Icon } from "astro-icon/components";
+
+const menuItems = [
+  { icon: "material-symbols-light:settings-outline", label: "常规", href: "/" },
+  {
+    icon: "material-symbols-light:desktop-windows-outline",
+    label: "桌面和 Dock 栏",
+    href: "/card",
+  },
+  { icon: "material-symbols-light:palette-outline", label: "外观", href: "/appearance" },
+  { icon: "material-symbols-light:info-outline", label: "关于", href: "/about" },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<aside class="dock-wrapper">
+  <nav class="dock-container group">
+    <ul class="menu-list">
+      {
+        menuItems.map((item) => (
+          <li>
+            <a href={item.href} class={`menu-item ${currentPath === item.href ? 'active' : ''}`}>
+              <div class="icon-wrapper">
+                <Icon name={item.icon} class="icon" />
+              </div>
+              <span class="label">{item.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</aside>
+
+<style>
+  .dock-wrapper {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+  }
+
+  .dock-container {
+    width: 56px;
+    background: var(--bg-1);
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    border: 1px solid transparent;
+
+    &:hover {
+      width: 200px;
+      box-shadow: 10px 0 30px oklch(0% 0 0 / 0.2);
+
+      .label {
+        opacity: 1;
+        transform: translateX(0);
+        transition-delay: 0.1s;
+      }
+    }
+  }
+
+  .menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    margin: 0;
+    list-style: none;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease;
+    /* 直角 */
+    border-radius: 0;
+
+    &:hover {
+      background: var(--bg-3);
+    }
+
+    &.active {
+      background: var(--text-1);
+      
+      .icon {
+        color: var(--bg-1);
+      }
+
+      .label {
+        color: var(--bg-1);
+      }
+
+      &:hover {
+        background: var(--text-1);
+      }
+    }
+  }
+
+  .icon-wrapper {
+    width: 40px; /* 等于 collapsed-width 减去 padding */
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+    color: var(--text-2);
+  }
+
+  .label {
+    margin-left: 12px;
+    white-space: nowrap;
+    font-size: 14px;
+    color: var(--text-1);
+    opacity: 0;
+     transform: translateX(-10px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+    align-self: center;
+  }
+</style>

@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+:root {
+  --bg-1: oklch(98% 0.01 250);
+  --bg-2: oklch(94% 0.02 250);
+  --bg-3: oklch(88% 0.03 250);
+
+  --text-1: oklch(20% 0.02 250);
+  --text-2: oklch(45% 0.02 250);
+  --text-3: oklch(65% 0.02 250);
+
+  --brand-1: oklch(60% 0.16 250);
+  --brand-2: oklch(50% 0.16 250);
+}
+
+[data-theme='dark'] {
+  --bg-1: oklch(18% 0.02 250);
+  --bg-2: oklch(22% 0.02 250);
+  --bg-3: oklch(28% 0.03 250);
+
+  --text-1: oklch(95% 0.01 250);
+  --text-2: oklch(75% 0.02 250);
+  --text-3: oklch(55% 0.02 250);
+
+  --brand-1: oklch(70% 0.14 250); 
+  --brand-2: oklch(80% 0.12 250);
+}
