@@ -1,9 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import CardContainer from '@components/cardcontainer.vue';
 ---
 
 <Layout>
-	<h1 class="text-3xl font-bold underline">
-		Hello, Astro with Tailwind CSS!
-	</h1>
+	<div class="">
+		<CardContainer client:load />
+	</div>
 </Layout>

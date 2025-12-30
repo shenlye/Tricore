@@ -9,6 +9,10 @@
   ],
   "compilerOptions": {
     "jsx": "preserve",
-    "jsxImportSource": "react"
+    "jsxImportSource": "react",
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@layouts/*": ["./src/layouts/*"]
+    }
   }
 }
