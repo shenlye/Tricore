@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 export const posts = pgTable("posts", {
 	id: serial("id").primaryKey(),
@@ -9,7 +9,11 @@ export const posts = pgTable("posts", {
 	categories: text("categories").array().notNull().default([]),
 	tags: text("tags").array().notNull().default([]),
 	cover: text("cover"),
+	isPublished: boolean("isPublished").notNull().default(false),
 
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt")
+		.notNull()
+		.defaultNow()
+		.$onUpdate(() => new Date()),
 });
