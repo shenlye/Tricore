@@ -1,18 +1,15 @@
-import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
-export const posts = sqliteTable("posts", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
+export const posts = pgTable("posts", {
+	id: serial("id").primaryKey(),
 	title: text("title").notNull(),
 	content: text("content").notNull(),
-	summary: text("summary"),
+	description: text("description"),
 	slug: text("slug").notNull().unique(),
+	categories: text("categories").array().notNull().default([]),
+	tags: text("tags").array().notNull().default([]),
+	cover: text("cover"),
 
-	// mode: "timestamp" 会自动将时间转换为时间戳
-	createAt: integer("createAt", { mode: "timestamp" })
-		.notNull()
-		.default(sql`(unixepoch())`),
-	updateAt: integer("updateAt", { mode: "timestamp" })
-		.notNull()
-		.default(sql`(unixepoch())`),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });

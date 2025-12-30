@@ -1,16 +1,20 @@
 {
-  "name": "my-api",
-  "scripts": {
-    "dev": "bun run --hot src/index.ts"
-  },
-  "dependencies": {
-    "@libsql/client": "^0.15.15",
-    "drizzle-orm": "^0.45.1",
-    "hono": "^4.11.3"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.3.10",
-    "@types/bun": "^1.3.5",
-    "drizzle-kit": "^0.31.8"
-  }
+	"name": "my-api",
+	"scripts": {
+		"dev": "bun run --hot src/index.ts"
+	},
+	"dependencies": {
+		"@hono/zod-openapi": "^1.2.0",
+		"@hono/zod-validator": "^0.7.6",
+		"@scalar/hono-api-reference": "^0.9.30",
+		"drizzle-orm": "^0.45.1",
+		"hono": "^4.11.3",
+		"pg": "^8.16.3",
+		"zod": "^4.2.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.10",
+		"@types/bun": "^1.3.5",
+		"drizzle-kit": "^0.31.8"
+	}
 }

@@ -1,36 +1,75 @@
 # My Simple Blog Backend
 
-- Bun
-- Hono
-- Drizzle ORM
-- Biome
-- SQLite
+English version: [README_EN.md](README_EN.md)
 
-## Quick Start
+基于 Bun + Hono 的博客后端 API。
 
-1. Install Dependencies
+## 技术栈
+
+- Bun - JavaScript 运行时
+- Hono - Web 框架
+- Drizzle ORM - 数据库 ORM
+- Biome - 代码格式化和检查
+- PostgreSQL- 数据库
+
+## 本地开发
+
+### 1. 安装依赖
 
 ```bash
 bun install
 ```
 
-2. Environment Configuration
+### 2. 配置环境变量
 
-Create a `.env` file in the root directory of the project.
+在项目根目录创建 `.env` 文件：
 
 ```env
-DB_FILE_NAME=mydb.sqlite
 ADMIN_SECRET_KEY=your_admin_secret_key
+DATABASE_URL=your_database_url
 ```
 
-3. Initialize Database
+说明：
+- `DATABASE_URL`: 数据库连接
+- `ADMIN_SECRET_KEY`: 密钥，用于身份验证
+
+### 3. 初始化数据库
+
 ```bash
 bunx drizzle-kit push
 ```
 
-4. Run the Server
+这会根据 schema 创建数据库表结构。
+
+### 4. 启动开发服务器
 
 ```bash
 bun run dev
 ```
 
+服务默认运行在 http://localhost:3000
+
+## Docker 部署
+
+创建 `docker-compose.yml` 文件：
+
+```yaml
+services:
+  blog-api:
+    image: ghcr.io/shenlye/my-api:latest
+    container_name: blog-backend
+    ports:
+      - "8088:3000"
+    volumes:
+      - ./mydb.sqlite:/app/mydb.sqlite
+    env_file:
+      - .env
+    restart: always
+```
+
+启动服务：
+
+```bash
+docker compose pull
+docker compose up -d
+```
