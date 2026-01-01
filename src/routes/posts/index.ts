@@ -1,8 +1,8 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import {
-	createPostHandler,
-	getPostHandler,
-	listPostsHandler,
+    createPostHandler,
+    getPostHandler,
+    listPostsHandler,
 } from "./handlers";
 import { createPostRoute, getPostRoute, listPostsRoute } from "./routes";
 
