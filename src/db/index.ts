@@ -54,5 +54,6 @@ export const seedDefaultUser = async () => {
         }
     } catch (error) {
         logger.error(error, "Failed to seed default user");
+        process.exit(1);
     }
 };
