@@ -10,6 +10,7 @@
         "@scalar/hono-api-reference": "^0.9.30",
         "drizzle-orm": "^0.45.1",
         "hono": "^4.11.3",
+        "hono-rate-limiter": "^0.5.3",
         "pg": "^8.16.3",
         "pino": "^10.1.0",
         "zod": "^4.2.1",
@@ -190,6 +191,8 @@
     "help-me": ["help-me@5.0.0", "https://registry.npmmirror.com/help-me/-/help-me-5.0.0.tgz", {}, "sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg=="],
 
     "hono": ["hono@4.11.3", "https://registry.npmmirror.com/hono/-/hono-4.11.3.tgz", {}, "sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w=="],
+
+    "hono-rate-limiter": ["hono-rate-limiter@0.5.3", "https://registry.npmmirror.com/hono-rate-limiter/-/hono-rate-limiter-0.5.3.tgz", { "peerDependencies": { "hono": "^4.10.8", "unstorage": "^1.17.3" }, "optionalPeers": ["unstorage"] }, "sha512-M0DxbVMpPELEzLi0AJg1XyBHLGJXz7GySjsPoK+gc5YeeBsdGDGe+2RvVuCAv8ydINiwlbxqYMNxUEyYfRji/A=="],
 
     "joycon": ["joycon@3.1.1", "https://registry.npmmirror.com/joycon/-/joycon-3.1.1.tgz", {}, "sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw=="],
 
