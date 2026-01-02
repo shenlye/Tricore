@@ -1,14 +1,9 @@
 import { count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { env } from "../lib/env";
 import { users } from "./schema";
 
-const databaseUrl = process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-    throw new Error("DATABASE_URL is missing");
-}
-
-export const db = drizzle(databaseUrl);
+export const db = drizzle(env.DATABASE_URL);
 
 export const seedDefaultUser = async () => {
     try {
@@ -16,17 +11,11 @@ export const seedDefaultUser = async () => {
         const userCount = result?.value ?? 0;
 
         if (userCount === 0) {
-            const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
-
-            if (!defaultAdminPassword) {
-                throw new Error(
-                    "DEFAULT_ADMIN_PASSWORD is missing in environment variables.",
-                );
-            }
-
             console.log("Creating default admin...");
 
-            const passwordHash = await Bun.password.hash(defaultAdminPassword);
+            const passwordHash = await Bun.password.hash(
+                env.DEFAULT_ADMIN_PASSWORD,
+            );
 
             await db
                 .insert(users)

@@ -2,15 +2,10 @@ import type { Context, Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { jwt } from "hono/jwt";
 import { z } from "zod";
-
-const jwtSecret = process.env.JWT_SECRET;
-
-if (!jwtSecret) {
-    throw new Error("JWT_SECRET is missing in environment variables.");
-}
+import { env } from "../lib/env";
 
 const jwtMiddleware = jwt({
-    secret: jwtSecret,
+    secret: env.JWT_SECRET,
 });
 
 export const authMiddleware = createMiddleware(

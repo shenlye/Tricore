@@ -3,6 +3,7 @@ import { eq, or } from "drizzle-orm";
 import { sign } from "hono/jwt";
 import { db } from "../../db";
 import { users } from "../../db/schema";
+import { env } from "../../lib/env";
 import type { loginRoute } from "./routers";
 
 export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
@@ -31,7 +32,7 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
     };
 
-    const token = await sign(payload, process.env.JWT_SECRET as string);
+    const token = await sign(payload, env.JWT_SECRET);
 
     return c.json({ token: token }, 200);
 };
