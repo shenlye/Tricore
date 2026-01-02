@@ -31,7 +31,9 @@ export const seedDefaultUser = async () => {
             await db
                 .insert(users)
                 .values({
+                    role: "admin",
                     username: "admin",
+                    email: "admin@example.com",
                     passwordHash: passwordHash,
                 })
                 .onConflictDoNothing();

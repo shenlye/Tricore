@@ -20,7 +20,9 @@ export const posts = pgTable("posts", {
 
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
+    role: text("role").notNull().default("user"),
     username: text("username").notNull().unique(),
+    email: text("email").notNull().unique(),
     passwordHash: text("passwordHash").notNull(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt")
