@@ -15,7 +15,7 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
                 success: false,
                 error: {
                     code: "NOT_FOUND",
-                    message: "文章不存在",
+                    message: "Post not found",
                 },
             },
             404,
