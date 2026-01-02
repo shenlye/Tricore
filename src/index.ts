@@ -15,16 +15,12 @@ app.use(
 
 await seedDefaultUser();
 
-app.get("/", (c) => {
-    return c.text("Hello Hono!");
-});
-
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
     type: "http",
     scheme: "bearer",
 });
 
-app.doc("/doc", {
+app.doc("/api/v1/openapi.json", {
     openapi: "3.0.0",
     info: {
         version: "1.0.0",
@@ -32,9 +28,9 @@ app.doc("/doc", {
     },
 });
 
-app.get("/scalar", Scalar({ url: "/doc" }));
+app.get("/docs", Scalar({ url: "/api/v1/openapi.json" }));
 
-app.route("/posts", postsRouter);
-app.route("/auth", authRouter);
+app.route("/api/v1/posts", postsRouter);
+app.route("/api/v1/auth", authRouter);
 
 export default app;
