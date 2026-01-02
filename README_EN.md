@@ -23,9 +23,15 @@ bun install
 Create a `.env` file in the project root:
 
 ```env
-ADMIN_SECRET_KEY=your_admin_secret_key
 DATABASE_URL=your_database_url
+JWT_SECRET=your_jwt_secret_key
+DEFAULT_ADMIN_PASSWORD=your_default_admin_password
 ```
+
+Description:
+- `DATABASE_URL`: PostgreSQL database connection string
+- `JWT_SECRET`: Secret key for generating and verifying JWT tokens
+- `DEFAULT_ADMIN_PASSWORD`: Password for the default admin account created on first run
 
 ### 3. Initialize Database
 
@@ -54,8 +60,6 @@ services:
     container_name: blog-backend
     ports:
       - "8088:3000"
-    volumes:
-      - ./mydb.sqlite:/app/mydb.sqlite
     env_file:
       - .env
     restart: always
@@ -66,4 +70,19 @@ Start the service:
 ```bash
 docker compose pull
 docker compose up -d
+```
+
+### Run with Docker Run
+
+If you don't want to use docker-compose, you can run the following command directly:
+
+```bash
+docker run -d \
+  --name blog-backend \
+  -p 8088:3000 \
+  -e DATABASE_URL="your_postgresql_url" \
+  -e JWT_SECRET="your_jwt_secret" \
+  -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
+  --restart always \
+  ghcr.io/shenlye/my-api:latest
 ```

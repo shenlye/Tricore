@@ -1,5 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { authMiddleware } from "../../middleware/auth";
+import { adminMiddleware, authMiddleware } from "../../middleware/auth";
 import { createPostSchema, PostSchema, paginationSchema } from "./schema";
 
 export const getPostRoute = createRoute({
@@ -62,7 +62,7 @@ export const listPostsRoute = createRoute({
 export const createPostRoute = createRoute({
     method: "post",
     path: "/",
-    middleware: [authMiddleware] as const,
+    middleware: [authMiddleware, adminMiddleware] as const,
     security: [{ Bearer: [] }],
     request: {
         body: {

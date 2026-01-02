@@ -25,13 +25,15 @@ bun install
 在项目根目录创建 `.env` 文件：
 
 ```env
-ADMIN_SECRET_KEY=your_admin_secret_key
 DATABASE_URL=your_database_url
+JWT_SECRET=your_jwt_secret_key
+DEFAULT_ADMIN_PASSWORD=your_default_admin_password
 ```
 
 说明：
-- `DATABASE_URL`: 数据库连接
-- `ADMIN_SECRET_KEY`: 密钥，用于身份验证
+- `DATABASE_URL`: PostgreSQL 数据库连接字符串
+- `JWT_SECRET`: 用于生成和验证 JWT Token 的密钥
+- `DEFAULT_ADMIN_PASSWORD`: 首次启动时自动创建的管理员账号 (admin) 的密码
 
 ### 3. 初始化数据库
 
@@ -60,8 +62,6 @@ services:
     container_name: blog-backend
     ports:
       - "8088:3000"
-    volumes:
-      - ./mydb.sqlite:/app/mydb.sqlite
     env_file:
       - .env
     restart: always
@@ -72,4 +72,19 @@ services:
 ```bash
 docker compose pull
 docker compose up -d
+```
+
+### 直接使用 Docker Run 运行
+
+如果你不想使用 docker-compose，也可以直接运行以下命令：
+
+```bash
+docker run -d \
+  --name blog-backend \
+  -p 8088:3000 \
+  -e DATABASE_URL="your_postgresql_url" \
+  -e JWT_SECRET="your_jwt_secret" \
+  -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
+  --restart always \
+  ghcr.io/shenlye/my-api:latest
 ```

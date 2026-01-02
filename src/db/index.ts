@@ -5,8 +5,7 @@ import { users } from "./schema";
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-    console.error("ERROR: DATABASE_URL is missing in environment variables.");
-    process.exit(1);
+    throw new Error("DATABASE_URL is missing");
 }
 
 export const db = drizzle(databaseUrl);
@@ -20,8 +19,9 @@ export const seedDefaultUser = async () => {
             const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
 
             if (!defaultAdminPassword) {
-                console.error("ERROR: DEFAULT_ADMIN_PASSWORD is not set.");
-                process.exit(1);
+                throw new Error(
+                    "DEFAULT_ADMIN_PASSWORD is missing in environment variables.",
+                );
             }
 
             console.log("Creating default admin...");
