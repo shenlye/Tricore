@@ -66,10 +66,15 @@ export const changePasswordHandler: RouteHandler<
 
     const newPasswordHash = await Bun.password.hash(newPassword);
 
-    await db
+    const result = await db
         .update(users)
         .set({ passwordHash: newPasswordHash })
-        .where(eq(users.id, userId));
+        .where(eq(users.id, userId))
+        .returning();
+    
+    if (result.length === 0) {
+        return c.json({ message: "User not found during update" }, 404);
+    }
 
     return c.json({ message: "Password changed successfully" }, 200);
 };
