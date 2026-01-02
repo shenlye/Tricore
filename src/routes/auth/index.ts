@@ -6,11 +6,18 @@ import { changePasswordRoute, loginRoute } from "./routers";
 const authRouter = new OpenAPIHono();
 
 authRouter.use(
+    "*",
     rateLimiter({
         windowMs: 15 * 60 * 1000,
         limit: 10,
         standardHeaders: "draft-7",
-        keyGenerator: (c) => c.req.header("x-forwarded-for") || "",
+        keyGenerator: (c) => {
+            return (
+                c.req.header("X-Forwarded-For") ||
+                c.req.header("x-real-ip") ||
+                "127.0.0.1"
+            );
+        },
     }),
 );
 
