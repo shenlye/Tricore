@@ -36,6 +36,16 @@ export const loginRoute = createRoute({
             },
             description: "Invalid username/email or password",
         },
+        429: {
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        message: z.string(),
+                    }),
+                },
+            },
+            description: "Too many login attempts, please try again later",
+        },
         500: {
             content: {
                 "application/json": {
