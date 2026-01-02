@@ -19,7 +19,7 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
     const dummyHash =
         "$argon2id$v=19$m=65536,t=3,p=4$c29tZXNhbHQ$q/v5V4AmI3f23aVw7V7d2A";
     const passwordHash = foundUser ? foundUser.passwordHash : dummyHash;
-    const isMatch = await Bun.password.verify(passwordHash, password);
+    const isMatch = await Bun.password.verify(password, passwordHash);
 
     if (!foundUser || !isMatch) {
         return c.json({ message: "Invalid username/email or password" }, 401);
