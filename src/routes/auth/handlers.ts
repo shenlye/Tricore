@@ -23,7 +23,16 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
     const isMatch = await Bun.password.verify(password, passwordHash);
 
     if (!foundUser || !isMatch) {
-        return c.json({ message: "Invalid username/email or password" }, 401);
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "UNAUTHORIZED",
+                    message: "Invalid username/email or password",
+                },
+            },
+            401,
+        );
     }
 
     const payload = {
@@ -34,7 +43,7 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
 
     const token = await sign(payload, env.JWT_SECRET);
 
-    return c.json({ token: token }, 200);
+    return c.json({ success: true, token: token }, 200);
 };
 
 export const changePasswordHandler: RouteHandler<
@@ -45,7 +54,16 @@ export const changePasswordHandler: RouteHandler<
 
     const userId = payload?.sub;
     if (!userId) {
-        return c.json({ message: "Unauthorized" }, 401);
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                },
+            },
+            401,
+        );
     }
 
     const user = await db
@@ -56,11 +74,29 @@ export const changePasswordHandler: RouteHandler<
 
     const foundUser = user[0];
     if (!foundUser) {
-        return c.json({ message: "User not found" }, 404);
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "NOT_FOUND",
+                    message: "User not found",
+                },
+            },
+            404,
+        );
     }
 
     if (oldPassword === newPassword) {
-        return c.json({ message: "Invalid request" }, 400);
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "BAD_REQUEST",
+                    message: "Invalid request",
+                },
+            },
+            400,
+        );
     }
 
     const isMatch = await Bun.password.verify(
@@ -69,7 +105,16 @@ export const changePasswordHandler: RouteHandler<
     );
 
     if (!isMatch) {
-        return c.json({ message: "Invalid request" }, 400);
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "BAD_REQUEST",
+                    message: "Invalid request",
+                },
+            },
+            400,
+        );
     }
 
     const newPasswordHash = await Bun.password.hash(newPassword);
@@ -81,8 +126,23 @@ export const changePasswordHandler: RouteHandler<
         .returning();
 
     if (result.length === 0) {
-        return c.json({ message: "User not found during update" }, 404);
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "NOT_FOUND",
+                    message: "User not found during update",
+                },
+            },
+            404,
+        );
     }
 
-    return c.json({ message: "Password changed successfully" }, 200);
+    return c.json(
+        {
+            success: true,
+            message: "Password changed successfully",
+        },
+        200,
+    );
 };

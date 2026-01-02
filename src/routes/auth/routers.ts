@@ -1,4 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { createErrorResponse } from "../../lib/route-factory";
 import { changePasswordSchema, loginSchema } from "./schema";
 
 export const loginRoute = createRoute({
@@ -7,9 +8,7 @@ export const loginRoute = createRoute({
     request: {
         body: {
             content: {
-                "application/json": {
-                    schema: loginSchema,
-                },
+                "application/json": { schema: loginSchema },
             },
         },
     },
@@ -18,44 +17,16 @@ export const loginRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
-                        token: z.string().openapi({
-                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                        }),
+                        success: z.boolean().default(true),
+                        token: z.string().openapi({ example: "eyJhbGci..." }),
                     }),
                 },
             },
             description: "User logged in successfully",
         },
-        401: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
-                },
-            },
-            description: "Invalid username/email or password",
-        },
-        429: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
-                },
-            },
-            description: "Too many requests, please try again later",
-        },
-        500: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
-                },
-            },
-            description: "Internal server error",
-        },
+        401: createErrorResponse("Invalid username/email or password"),
+        429: createErrorResponse("Too many requests, please try again later"),
+        500: createErrorResponse("Internal server error"),
     },
 });
 
@@ -66,9 +37,7 @@ export const changePasswordRoute = createRoute({
     request: {
         body: {
             content: {
-                "application/json": {
-                    schema: changePasswordSchema,
-                },
+                "application/json": { schema: changePasswordSchema },
             },
         },
     },
@@ -77,51 +46,16 @@ export const changePasswordRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
+                        success: z.boolean().default(true),
                         message: z.string(),
                     }),
                 },
             },
             description: "Password changed successfully",
         },
-        400: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
-                },
-            },
-            description: "Invalid request data",
-        },
-        401: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
-                },
-            },
-            description: "Unauthorized",
-        },
-        404: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
-                },
-            },
-            description: "User not found",
-        },
-        500: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
-                },
-            },
-            description: "Internal server error",
-        },
+        400: createErrorResponse("Invalid request data"),
+        401: createErrorResponse("Unauthorized"),
+        404: createErrorResponse("User not found"),
+        500: createErrorResponse("Internal server error"),
     },
 });

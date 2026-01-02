@@ -1,4 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { createErrorResponse } from "../../lib/route-factory";
 import { adminMiddleware, authMiddleware } from "../../middleware/auth";
 import { createPostSchema, PostSchema, paginationSchema } from "./schema";
 
@@ -15,22 +16,15 @@ export const getPostRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
+                        success: z.boolean().default(true),
                         data: PostSchema,
                     }),
                 },
             },
             description: "Retrieve the post",
         },
-        404: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        error: z.string(),
-                    }),
-                },
-            },
-            description: "Post not found",
-        },
+        404: createErrorResponse("Post not found"),
+        500: createErrorResponse("Internal server error"),
     },
 });
 
@@ -45,6 +39,7 @@ export const listPostsRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
+                        success: z.boolean().default(true),
                         data: z.array(PostSchema.omit({ content: true })),
                         meta: z.object({
                             total: z.number(),
@@ -56,6 +51,7 @@ export const listPostsRoute = createRoute({
             },
             description: "Retrieve a list of posts",
         },
+        500: createErrorResponse("Internal server error"),
     },
 });
 
@@ -78,6 +74,7 @@ export const createPostRoute = createRoute({
             content: {
                 "application/json": {
                     schema: z.object({
+                        success: z.boolean().default(true),
                         message: z.string(),
                         data: PostSchema,
                     }),
@@ -85,49 +82,10 @@ export const createPostRoute = createRoute({
             },
             description: "Post created successfully",
         },
-        400: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        error: z.string(),
-                        details: z.array(z.any()).optional(),
-                    }),
-                },
-            },
-            description: "Invalid data",
-        },
-        401: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        error: z.string(),
-                    }),
-                },
-            },
-            description: "Unauthorized",
-        },
-        409: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        error: z.string(),
-                        message: z.string(),
-                        detail: z.string(),
-                    }),
-                },
-            },
-            description: "Conflict - Slug already exists",
-        },
-        500: {
-            content: {
-                "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                        error: z.string(),
-                    }),
-                },
-            },
-            description: "Internal Server Error",
-        },
+        400: createErrorResponse("Invalid request data"),
+        401: createErrorResponse("Unauthorized"),
+        403: createErrorResponse("Forbidden"),
+        409: createErrorResponse("Conflict - Slug already exists"),
+        500: createErrorResponse("Internal Server Error"),
     },
 });

@@ -16,7 +16,16 @@ export const authMiddleware = createMiddleware(
         } catch (e) {
             logger.error({ err: e }, "JWT Verification Failed");
 
-            return c.json({ error: "Unauthorized" }, 401);
+            return c.json(
+                {
+                    success: false,
+                    error: {
+                        code: "UNAUTHORIZED",
+                        message: "Unauthorized",
+                    },
+                },
+                401,
+            );
         }
     },
 );
@@ -33,11 +42,29 @@ export const adminMiddleware = createMiddleware(
 
         const result = payloadSchema.safeParse(payload);
         if (!result.success) {
-            return c.json({ error: "Unauthorized: Invalid session" }, 401);
+            return c.json(
+                {
+                    success: false,
+                    error: {
+                        code: "UNAUTHORIZED",
+                        message: "Unauthorized: Invalid session",
+                    },
+                },
+                401,
+            );
         }
 
         if (result.data.role !== "admin") {
-            return c.json({ error: "Forbidden: Admin access required" }, 403);
+            return c.json(
+                {
+                    success: false,
+                    error: {
+                        code: "FORBIDDEN",
+                        message: "Forbidden: Admin access required",
+                    },
+                },
+                403,
+            );
         }
 
         c.set("user", result.data);

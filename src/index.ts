@@ -6,7 +6,36 @@ import { logger } from "./lib/logger";
 import authRouter from "./routes/auth/index";
 import postsRouter from "./routes/posts/index";
 
-const app = new OpenAPIHono();
+const app = new OpenAPIHono({
+    defaultHook: (result, c) => {
+        if (!result.success) {
+            return c.json(
+                {
+                    success: false,
+                    error: {
+                        code: "VALIDATION_ERROR",
+                        message: "Validation Error",
+                        details: result.error.issues,
+                    },
+                },
+                400,
+            );
+        }
+    },
+});
+
+app.onError((err, c) => {
+    return c.json(
+        {
+            success: false,
+            error: {
+                code: "INTERNAL_SERVER_ERROR",
+                message: err.message || "Internal Server Error",
+            },
+        },
+        500,
+    );
+});
 
 app.use(
     "*",

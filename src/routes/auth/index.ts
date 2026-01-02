@@ -26,7 +26,11 @@ authRouter.use(
             return `${c.req.header("user-agent") ?? "unknown"}|${c.req.path}`;
         },
         message: {
-            message: "Too many requests, please try again later.",
+            success: false,
+            error: {
+                code: "TOO_MANY_REQUESTS",
+                message: "Too many requests, please try again later.",
+            },
         },
     }),
 );

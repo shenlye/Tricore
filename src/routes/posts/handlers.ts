@@ -10,11 +10,21 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
     const result = await db.select().from(posts).where(eq(posts.slug, slug));
 
     if (result.length === 0) {
-        return c.json({ error: "文章不存在" }, 404);
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "NOT_FOUND",
+                    message: "文章不存在",
+                },
+            },
+            404,
+        );
     }
 
     return c.json(
         {
+            success: true,
             data: {
                 ...result[0],
                 createdAt: result[0].createdAt.toISOString(),
@@ -54,6 +64,7 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
 
     return c.json(
         {
+            success: true,
             data: data.map((item) => ({
                 ...item,
                 createdAt: item.createdAt.toISOString(),
@@ -69,57 +80,74 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
     );
 };
 
-interface PostgresError extends Error {
-    code?: string;
-    detail?: string;
-}
-
 export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     c,
 ) => {
     const { title, content, slug } = c.req.valid("json");
+    const payload = c.get("jwtPayload");
 
-    try {
-        const result = await db
-            .insert(posts)
-            .values({ title, content, slug })
-            .returning();
-
+    const userId = payload?.sub;
+    if (!userId) {
         return c.json(
             {
-                message: "Post created successfully",
-                data: {
-                    ...result[0],
-                    createdAt: result[0].createdAt.toISOString(),
-                    updatedAt: result[0].updatedAt.toISOString(),
+                success: false,
+                error: {
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
                 },
             },
-            201,
-        );
-    } catch (e) {
-
-        // FIXME: Slug 冲突还是报错500，记得修一下
-
-        const error = e as PostgresError;
-
-        if (error.code === "23505") {
-            return c.json(
-                {
-                    error: "Conflict",
-                    message: "创建失败：Slug 已存在",
-                    detail: `The slug '${slug}' is already in use.`,
-                },
-                409,
-            );
-        }
-
-        console.error("Database Error:", error);
-        return c.json(
-            {
-                message: "服务器内部错误",
-                error: error.message || "Unknown database error",
-            },
-            500,
+            401,
         );
     }
+
+    const isAdmin = payload?.role === "admin";
+    if (!isAdmin) {
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "FORBIDDEN",
+                    message: "Forbidden: Admin access required",
+                },
+            },
+            403,
+        );
+    }
+
+    const existingPost = await db
+        .select()
+        .from(posts)
+        .where(eq(posts.slug, slug))
+        .limit(1);
+
+    if (existingPost.length > 0) {
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "CONFLICT",
+                    message: "Slug already exists, please choose a different one",
+                },
+            },
+            409,
+        );
+    }
+
+    const result = await db
+        .insert(posts)
+        .values({ title, content, slug })
+        .returning();
+
+    return c.json(
+        {
+            success: true,
+            message: "Post created successfully",
+            data: {
+                ...result[0],
+                createdAt: result[0].createdAt.toISOString(),
+                updatedAt: result[0].updatedAt.toISOString(),
+            },
+        },
+        201,
+    );
 };
