@@ -1,4 +1,4 @@
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { env } from "../lib/env";
 import { logger } from "../lib/logger";
@@ -8,12 +8,15 @@ export const db = drizzle(env.DATABASE_URL);
 
 export const seedDefaultUser = async () => {
     try {
-        const [result] = await db.select({ value: count() }).from(users);
-        const userCount = result?.value ?? 0;
+        const [result] = await db
+            .select({ value: count() })
+            .from(users)
+            .where(eq(users.role, "admin"));
+        const adminExists = (result.value ?? 0) > 0;
 
-        if (userCount === 0) {
+        if (!adminExists) {
             logger.info(
-                "Database is empty. Initializing default admin user...",
+                "admin user not found. Initializing default admin user...",
             );
 
             const passwordHash = await Bun.password.hash(
