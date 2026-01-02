@@ -56,19 +56,20 @@ export const changePasswordHandler: RouteHandler<
         return c.json({ message: "User not found" }, 404);
     }
 
-    const isMatch = await Bun.password.verify(
-        oldPassword,
-        foundUser.passwordHash,
-    );
-    if (!isMatch) {
-        return c.json({ message: "Old password is incorrect" }, 401);
-    }
-
     if (oldPassword === newPassword) {
         return c.json(
             { message: "New password must be different from old password" },
             400,
         );
+    }
+
+    const isMatch = await Bun.password.verify(
+        oldPassword,
+        foundUser.passwordHash,
+    );
+    
+    if (!isMatch) {
+        return c.json({ message: "Old password is incorrect" }, 401);
     }
 
     const newPasswordHash = await Bun.password.hash(newPassword);
