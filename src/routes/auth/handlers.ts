@@ -31,14 +31,7 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
     };
 
-    const jwtSecret = process.env.JWT_SECRET;
-
-    if (!jwtSecret) {
-        console.error("ERROR: JWT_SECRET is not set.");
-        return c.json({ message: "Internal server error" }, 500);
-    }
-
-    const token = await sign(payload, jwtSecret);
+    const token = await sign(payload, process.env.JWT_SECRET as string);
 
     return c.json({ token: token }, 200);
 };
