@@ -25,12 +25,13 @@ const app = new OpenAPIHono({
 });
 
 app.onError((err, c) => {
+    logger.error(err);
     return c.json(
         {
             success: false,
             error: {
                 code: "INTERNAL_SERVER_ERROR",
-                message: err.message || "Internal Server Error",
+                message: "Internal Server Error",
             },
         },
         500,
