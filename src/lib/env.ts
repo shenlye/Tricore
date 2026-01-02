@@ -14,7 +14,7 @@ if (!parsed.success) {
     process.exit(1);
 }
 
-export const env = parsed.data;
+const env = parsed.data;
 
 if (env.JWT_SECRET === "your_jwt_secret_key" && env.NODE_ENV === "production") {
     console.error(
@@ -22,3 +22,5 @@ if (env.JWT_SECRET === "your_jwt_secret_key" && env.NODE_ENV === "production") {
     );
     process.exit(1);
 }
+
+export { env };
