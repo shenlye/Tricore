@@ -104,6 +104,7 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         description,
         cover,
         isPublished,
+        categoryId,
     } = c.req.valid("json");
     let slug = providedSlug;
     if (!slug) {
@@ -155,6 +156,7 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
             authorId: Number(authorId),
             cover,
             isPublished,
+            categoryId,
         })
         .returning();
 
@@ -183,11 +185,18 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         );
     }
 
+    const {
+        category,
+        postsToTags,
+        categoryId: _categoryId,
+        ...cleanResult
+    } = result;
+
     return c.json(
         {
             success: true,
             data: {
-                ...result,
+                ...cleanResult,
                 categories: result.category ? [result.category.name] : [],
                 tags: result.postsToTags.map((pt) => pt.tag.name),
                 createdAt: result.createdAt.toISOString(),
