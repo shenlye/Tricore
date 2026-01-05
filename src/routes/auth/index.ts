@@ -35,7 +35,8 @@ authRouter.use(
     }),
 );
 
-authRouter.openapi(loginRoute, loginHandler);
-authRouter.openapi(changePasswordRoute, changePasswordHandler);
+const routes = authRouter
+    .openapi(loginRoute, loginHandler)
+    .openapi(changePasswordRoute, changePasswordHandler);
 
-export default authRouter;
+export default routes;

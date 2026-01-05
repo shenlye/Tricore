@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger as honoLogger } from "hono/logger";
@@ -9,7 +10,7 @@ import { logger } from "./lib/logger";
 import authRouter from "./routes/auth/index";
 import postsRouter from "./routes/posts/index";
 
-export const app = new OpenAPIHono({
+const app = new OpenAPIHono({
     // 当 JSON 格式正确，但不符合 Zod schema 时触发
     defaultHook: (result, c) => {
         if (!result.success) {
@@ -26,7 +27,9 @@ export const app = new OpenAPIHono({
             );
         }
     },
-});
+})
+    .route("/api/v1/posts", postsRouter)
+    .route("/api/v1/auth", authRouter);
 
 app.onError((err, c) => {
     // JSON 多打了一个逗号，导致 JSON.parse 失败，抛出一个 Malformed JSON 错误
@@ -97,9 +100,6 @@ app.doc("/api/v1/openapi.json", {
 
 app.get("/docs", Scalar({ url: "/api/v1/openapi.json" }));
 
-app.route("/api/v1/posts", postsRouter);
-app.route("/api/v1/auth", authRouter);
-
 app.get("/health", (c) => {
     return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
@@ -107,13 +107,11 @@ app.get("/health", (c) => {
 const port = env.PORT;
 logger.info(`Server starting on port ${port}...`);
 
+export type AppType = typeof app;
+
 export default {
     port,
     fetch: app.fetch,
 };
 
-const routes = app
-    .route("/api/v1/posts", postsRouter)
-    .route("/api/v1/auth", authRouter);
-
-export type AppType = typeof routes;
+export { app };
