@@ -13,4 +13,4 @@ RUN mkdir -p /app/data
 
 EXPOSE 3000
 
-ENTRYPOINT ["sh", "-c", "bunx drizzle-kit push && bun run src/index.ts"]
+ENTRYPOINT ["sh", "-c", "bunx drizzle-kit push && bun run ./src/index.ts"]

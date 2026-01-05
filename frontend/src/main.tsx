@@ -6,7 +6,6 @@ import App from "./App.tsx";
 
 const queryClient = new QueryClient();
 
-
 // biome-ignore lint/style/noNonNullAssertion: root element is defined in index.html
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>

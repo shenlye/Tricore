@@ -27,7 +27,33 @@ const app = new OpenAPIHono({
             );
         }
     },
-})
+});
+
+app.use(
+    "*",
+    honoLogger((str) => logger.info(str)),
+);
+
+app.use(
+    "*",
+    cors({
+        origin: [
+            "https://blog.shenley.cn",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ],
+
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+
+        allowHeaders: ["Content-Type", "Authorization"],
+
+        credentials: true,
+
+        maxAge: 600,
+    }),
+);
+
+const routes = app
     .route("/api/v1/posts", postsRouter)
     .route("/api/v1/auth", authRouter);
 
@@ -62,26 +88,6 @@ app.onError((err, c) => {
     );
 });
 
-app.use(
-    "*",
-    honoLogger((str) => logger.info(str)),
-);
-
-app.use(
-    "*",
-    cors({
-        origin: ["https://blog.shenley.cn", "http://localhost:5173"],
-
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-
-        allowHeaders: ["Content-Type", "Authorization"],
-
-        credentials: true,
-
-        maxAge: 600,
-    }),
-);
-
 // 初始化默认管理员用户
 await seedDefaultUser();
 
@@ -107,7 +113,7 @@ app.get("/health", (c) => {
 const port = env.PORT;
 logger.info(`Server starting on port ${port}...`);
 
-export type AppType = typeof app;
+export type AppType = typeof routes;
 
 export default {
     port,
