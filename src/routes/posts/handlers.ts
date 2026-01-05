@@ -102,6 +102,8 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         content,
         slug: providedSlug,
         description,
+        cover,
+        isPublished,
     } = c.req.valid("json");
     let slug = providedSlug;
     if (!slug) {
@@ -127,10 +129,33 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
             409,
         );
     }
+    const payload = c.get("jwtPayload");
+
+    const authorId = payload?.sub;
+    if (!authorId) {
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "UNAUTHORIZED",
+                    message: "Unauthorized",
+                },
+            },
+            401,
+        );
+    }
 
     const [newPost] = await db
         .insert(posts)
-        .values({ title, content, slug, description })
+        .values({
+            title,
+            content,
+            slug,
+            description,
+            authorId: Number(authorId),
+            cover,
+            isPublished,
+        })
         .returning();
 
     const result = await db.query.posts.findFirst({
