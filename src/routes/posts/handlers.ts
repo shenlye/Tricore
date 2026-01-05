@@ -58,6 +58,9 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
         db.query.posts.findMany({
             limit: limit,
             offset: (page - 1) * limit,
+            columns: {
+                content: false,
+            },
             with: {
                 category: true,
                 postsToTags: {
