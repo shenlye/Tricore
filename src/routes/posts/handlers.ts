@@ -1,7 +1,9 @@
 import type { RouteHandler } from "@hono/zod-openapi";
-import { postService } from "../../index";
+import { db } from "../../db";
+import { PostService } from "../../services/posts";
 import type { createPostRoute, getPostRoute, listPostsRoute } from "./routes";
 
+export const postService = new PostService(db);
 export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
     const { slug } = c.req.valid("param");
 
@@ -106,16 +108,36 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         );
     }
 
-    const result = await postService.createPost({
-        title,
-        content,
-        slug,
-        description,
-        authorId: Number(authorId),
-        cover,
-        isPublished,
-        categoryId,
-    });
+    // biome-ignore lint/suspicious/noExplicitAny: 不会写
+    let result: any;
+    try {
+        result = await postService.createPost({
+            title,
+            content,
+            slug,
+            description,
+            authorId: Number(authorId),
+            cover,
+            isPublished,
+            categoryId,
+        });
+    } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        if (message.includes("UNIQUE") && message.includes("posts.slug")) {
+            return c.json(
+                {
+                    success: false,
+                    error: {
+                        code: "CONFLICT",
+                        message:
+                            "Slug already exists, please choose a different one",
+                    },
+                },
+                409,
+            );
+        }
+        throw e;
+    }
 
     if (!result) {
         return c.json(

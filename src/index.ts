@@ -2,15 +2,10 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { HTTPException } from "hono/http-exception";
 import { logger as honoLogger } from "hono/logger";
-import { db, seedDefaultUser } from "./db";
+import { seedDefaultUser } from "./db";
 import { logger } from "./lib/logger";
 import authRouter from "./routes/auth/index";
 import postsRouter from "./routes/posts/index";
-import { AuthService } from "./services/auth";
-import { PostService } from "./services/posts";
-
-export const postService = new PostService(db);
-export const authService = new AuthService(db);
 
 const app = new OpenAPIHono({
     // 当 JSON 格式正确，但不符合 Zod schema 时触发

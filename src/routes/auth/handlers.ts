@@ -1,7 +1,9 @@
 import type { RouteHandler } from "@hono/zod-openapi";
-import { authService } from "../../index";
+import { db } from "../../db";
+import { AuthService } from "../../services/auth";
 import type { changePasswordRoute, loginRoute } from "./routers";
 
+export const authService = new AuthService(db);
 export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
     const { identifier, password } = c.req.valid("json");
 
