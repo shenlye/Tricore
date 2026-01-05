@@ -11,4 +11,4 @@ COPY . .
 RUN mkdir -p /app/data
 EXPOSE 3000
 
-ENTRYPOINT ["sh", "-c", "bunx drizzle-kit push && bun index.js"]
+ENTRYPOINT ["sh", "-c", "bunx drizzle-kit push && bun index.ts"]
