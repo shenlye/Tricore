@@ -1,14 +1,16 @@
-FROM oven/bun:1.3.3-alpine
+FROM oven/bun:latest AS base
 WORKDIR /app
 
+FROM base AS install
 COPY package.json bun.lock ./
+RUN bun install
 
-RUN bun install --frozen-lockfile && \
-    rm -rf ~/.bun/install/cache
-
+FROM base AS release
+COPY --from=install /app/node_modules ./node_modules
 COPY . .
 
 RUN mkdir -p /app/data
+
 EXPOSE 3000
 
-ENTRYPOINT ["sh", "-c", "bunx drizzle-kit push && bun run start"]
+ENTRYPOINT ["sh", "-c", "bunx drizzle-kit push && bun run src/index.ts"]
