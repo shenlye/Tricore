@@ -1,5 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { createErrorResponse } from "../../lib/route-factory";
+import { createSuccessSchema } from "../../lib/schema";
 import { authMiddleware } from "../../middleware/auth";
 import { changePasswordSchema, loginSchema } from "./schema";
 
@@ -17,9 +18,13 @@ export const loginRoute = createRoute({
         200: {
             content: {
                 "application/json": {
-                    schema: z.object({
-                        token: z.string().openapi({ example: "eyJhbGci..." }),
-                    }),
+                    schema: createSuccessSchema(
+                        z.object({
+                            token: z
+                                .string()
+                                .openapi({ example: "eyJhbGci..." }),
+                        }),
+                    ),
                 },
             },
             description: "User logged in successfully",
@@ -46,9 +51,11 @@ export const changePasswordRoute = createRoute({
         200: {
             content: {
                 "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                    }),
+                    schema: createSuccessSchema(
+                        z.object({
+                            message: z.string(),
+                        }),
+                    ),
                 },
             },
             description: "Password changed successfully",

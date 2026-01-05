@@ -7,9 +7,19 @@ import type { createPostRoute, getPostRoute, listPostsRoute } from "./routes";
 export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
     const { slug } = c.req.valid("param");
 
-    const result = await db.select().from(posts).where(eq(posts.slug, slug));
+    const result = await db.query.posts.findFirst({
+        where: eq(posts.slug, slug),
+        with: {
+            category: true,
+            postsToTags: {
+                with: {
+                    tag: true,
+                },
+            },
+        },
+    });
 
-    if (result.length === 0) {
+    if (!result) {
         return c.json(
             {
                 success: false,
@@ -24,10 +34,13 @@ export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
 
     return c.json(
         {
+            success: true,
             data: {
-                ...result[0],
-                createdAt: result[0].createdAt.toISOString(),
-                updatedAt: result[0].updatedAt.toISOString(),
+                ...result,
+                categories: result.category ? [result.category.name] : [],
+                tags: result.postsToTags.map((pt) => pt.tag.name),
+                createdAt: result.createdAt.toISOString(),
+                updatedAt: result.updatedAt.toISOString(),
             },
         },
         200,
@@ -42,29 +55,29 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
     const limit = Math.min(20, Math.max(1, Number(limitStr) || 10));
 
     const [data, total] = await Promise.all([
-        db
-            .select({
-                id: posts.id,
-                title: posts.title,
-                slug: posts.slug,
-                description: posts.description,
-                categories: posts.categories,
-                tags: posts.tags,
-                cover: posts.cover,
-                createdAt: posts.createdAt,
-                updatedAt: posts.updatedAt,
-                isPublished: posts.isPublished,
-            })
-            .from(posts)
-            .limit(limit)
-            .offset((page - 1) * limit),
+        db.query.posts.findMany({
+            limit: limit,
+            offset: (page - 1) * limit,
+            with: {
+                category: true,
+                postsToTags: {
+                    with: {
+                        tag: true,
+                    },
+                },
+            },
+            orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+        }),
         db.select({ count: count() }).from(posts),
     ]);
 
     return c.json(
         {
+            success: true,
             data: data.map((item) => ({
                 ...item,
+                categories: item.category ? [item.category.name] : [],
+                tags: item.postsToTags.map((pt) => pt.tag.name),
                 createdAt: item.createdAt.toISOString(),
                 updatedAt: item.updatedAt.toISOString(),
             })),
@@ -81,44 +94,24 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
 export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     c,
 ) => {
-    const { title, content, slug } = c.req.valid("json");
-    const payload = c.get("jwtPayload");
-
-    const userId = payload?.sub;
-    if (!userId) {
-        return c.json(
-            {
-                success: false,
-                error: {
-                    code: "UNAUTHORIZED",
-                    message: "Unauthorized",
-                },
-            },
-            401,
-        );
+    const {
+        title,
+        content,
+        slug: providedSlug,
+        description,
+    } = c.req.valid("json");
+    let slug = providedSlug;
+    if (!slug) {
+        const datePrefix = new Date().toISOString().split("T")[0]; // 2026-01-05
+        const shortId = Math.random().toString(36).substring(2, 8); // 随机 6 位字符
+        slug = `${datePrefix}-${shortId}`;
     }
 
-    const isAdmin = payload?.role === "admin";
-    if (!isAdmin) {
-        return c.json(
-            {
-                success: false,
-                error: {
-                    code: "FORBIDDEN",
-                    message: "Forbidden: Admin access required",
-                },
-            },
-            403,
-        );
-    }
+    const existingPost = await db.query.posts.findFirst({
+        where: eq(posts.slug, slug),
+    });
 
-    const existingPost = await db
-        .select()
-        .from(posts)
-        .where(eq(posts.slug, slug))
-        .limit(1);
-
-    if (existingPost.length > 0) {
+    if (existingPost) {
         return c.json(
             {
                 success: false,
@@ -132,18 +125,45 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         );
     }
 
-    const result = await db
+    const [newPost] = await db
         .insert(posts)
-        .values({ title, content, slug })
+        .values({ title, content, slug, description })
         .returning();
+
+    const result = await db.query.posts.findFirst({
+        where: eq(posts.id, newPost.id),
+        with: {
+            category: true,
+            postsToTags: {
+                with: {
+                    tag: true,
+                },
+            },
+        },
+    });
+
+    if (!result) {
+        return c.json(
+            {
+                success: false,
+                error: {
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Failed to retrieve created post",
+                },
+            },
+            500,
+        );
+    }
 
     return c.json(
         {
-            message: "Post created successfully",
+            success: true,
             data: {
-                ...result[0],
-                createdAt: result[0].createdAt.toISOString(),
-                updatedAt: result[0].updatedAt.toISOString(),
+                ...result,
+                categories: result.category ? [result.category.name] : [],
+                tags: result.postsToTags.map((pt) => pt.tag.name),
+                createdAt: result.createdAt.toISOString(),
+                updatedAt: result.updatedAt.toISOString(),
             },
         },
         201,

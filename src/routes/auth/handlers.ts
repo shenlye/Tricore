@@ -43,7 +43,13 @@ export const loginHandler: RouteHandler<typeof loginRoute> = async (c) => {
 
     const token = await sign(payload, env.JWT_SECRET);
 
-    return c.json({ token: token }, 200);
+    return c.json(
+        {
+            success: true,
+            data: { token: token },
+        },
+        200,
+    );
 };
 
 export const changePasswordHandler: RouteHandler<
@@ -140,7 +146,10 @@ export const changePasswordHandler: RouteHandler<
 
     return c.json(
         {
-            message: "Password changed successfully",
+            success: true,
+            data: {
+                message: "Password changed successfully",
+            },
         },
         200,
     );

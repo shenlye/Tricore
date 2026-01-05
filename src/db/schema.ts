@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
     index,
     integer,
@@ -21,6 +21,10 @@ export const users = sqliteTable("users", {
         .default(sql`(unixepoch())`)
         .$onUpdate(() => new Date()),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+    posts: many(posts),
+}));
 
 export const posts = sqliteTable(
     "posts",
@@ -55,16 +59,36 @@ export const posts = sqliteTable(
     ],
 );
 
+export const postsRelations = relations(posts, ({ one, many }) => ({
+    author: one(users, {
+        fields: [posts.authorId],
+        references: [users.id],
+    }),
+    category: one(categories, {
+        fields: [posts.categoryId],
+        references: [categories.id],
+    }),
+    postsToTags: many(postsToTags),
+}));
+
 export const tags = sqliteTable("tags", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     name: text("name").notNull().unique(),
 });
+
+export const tagsRelations = relations(tags, ({ many }) => ({
+    postsToTags: many(postsToTags),
+}));
 
 export const categories = sqliteTable("categories", {
     id: integer("id").primaryKey({ autoIncrement: true }),
     name: text("name").notNull().unique(),
     slug: text("slug").notNull().unique(),
 });
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+    posts: many(posts),
+}));
 
 export const postsToTags = sqliteTable(
     "posts_to_tags",
@@ -78,3 +102,14 @@ export const postsToTags = sqliteTable(
     },
     (t) => [primaryKey({ columns: [t.postId, t.tagId] })],
 );
+
+export const postsToTagsRelations = relations(postsToTags, ({ one }) => ({
+    post: one(posts, {
+        fields: [postsToTags.postId],
+        references: [posts.id],
+    }),
+    tag: one(tags, {
+        fields: [postsToTags.tagId],
+        references: [tags.id],
+    }),
+}));

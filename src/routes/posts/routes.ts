@@ -1,5 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { createErrorResponse } from "../../lib/route-factory";
+import {
+    createPaginatedSuccessSchema,
+    createSuccessSchema,
+} from "../../lib/schema";
 import { adminMiddleware, authMiddleware } from "../../middleware/auth";
 import { createPostSchema, PostSchema, paginationSchema } from "./schema";
 
@@ -15,9 +19,7 @@ export const getPostRoute = createRoute({
         200: {
             content: {
                 "application/json": {
-                    schema: z.object({
-                        data: PostSchema,
-                    }),
+                    schema: createSuccessSchema(PostSchema),
                 },
             },
             description: "Retrieve the post",
@@ -37,14 +39,9 @@ export const listPostsRoute = createRoute({
         200: {
             content: {
                 "application/json": {
-                    schema: z.object({
-                        data: z.array(PostSchema.omit({ content: true })),
-                        meta: z.object({
-                            total: z.number(),
-                            page: z.number(),
-                            limit: z.number(),
-                        }),
-                    }),
+                    schema: createPaginatedSuccessSchema(
+                        PostSchema.omit({ content: true }),
+                    ),
                 },
             },
             description: "Retrieve a list of posts",
@@ -71,10 +68,7 @@ export const createPostRoute = createRoute({
         201: {
             content: {
                 "application/json": {
-                    schema: z.object({
-                        message: z.string(),
-                        data: PostSchema,
-                    }),
+                    schema: createSuccessSchema(PostSchema),
                 },
             },
             description: "Post created successfully",

@@ -3,10 +3,11 @@ import { count, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { env } from "../lib/env";
 import { logger } from "../lib/logger";
+import * as schema from "./schema";
 import { users } from "./schema";
 
 const sqlite = new Database(env.DATABASE_URL);
-export const db = drizzle(sqlite);
+export const db = drizzle(sqlite, { schema });
 
 export const seedDefaultUser = async () => {
     try {

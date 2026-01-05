@@ -3,8 +3,8 @@ import { z } from "@hono/zod-openapi";
 export const PostSchema = z
     .object({
         id: z.number().openapi({ example: 1 }),
-        title: z.string().openapi({ example: "Hello World" }),
-        slug: z.string().openapi({ example: "hello-world" }),
+        title: z.string().nullable().openapi({ example: "Hello World" }),
+        slug: z.string().nullable().openapi({ example: "hello-world" }),
         content: z.string().openapi({ example: "This is a post content" }),
         description: z
             .string()
@@ -26,21 +26,21 @@ export const createPostSchema = z
     .object({
         title: z
             .string()
-            .min(1, "Title is required")
             .max(100, "Title is too long")
+            .optional()
             .openapi({ example: "New Post" }),
         slug: z
             .string()
-            .min(1)
             .regex(
                 /^[a-z0-9-]+$/,
                 "Slug can only contain lowercase letters, numbers, and hyphens",
             )
             .max(100, "Slug is too long")
+            .optional()
             .openapi({ example: "new-post" }),
         content: z
             .string()
-            .min(10, "Content is too short")
+            .min(1, "Content is required")
             .openapi({ example: "This is the content of the new post." }),
         description: z
             .string()

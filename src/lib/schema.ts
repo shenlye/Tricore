@@ -9,4 +9,32 @@ export const ErrorSchema = z.object({
     }),
 });
 
+export const createSuccessSchema = <T extends z.ZodTypeAny>(dataSchema: T) => {
+    return z.object({
+        success: z.boolean().openapi({ example: true }),
+        data: dataSchema,
+        meta: z
+            .object({
+                timestamp: z
+                    .string()
+                    .openapi({ example: "2026-01-01T00:00:00Z" }),
+            })
+            .optional(),
+    });
+};
+
+export const createPaginatedSuccessSchema = <T extends z.ZodTypeAny>(
+    dataSchema: T,
+) => {
+    return z.object({
+        success: z.boolean().openapi({ example: true }),
+        data: z.array(dataSchema),
+        meta: z.object({
+            total: z.number().openapi({ example: 100 }),
+            page: z.number().openapi({ example: 1 }),
+            limit: z.number().openapi({ example: 10 }),
+        }),
+    });
+};
+
 export type ErrorType = z.infer<typeof ErrorSchema>;
