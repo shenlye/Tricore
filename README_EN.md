@@ -60,6 +60,8 @@ services:
     container_name: blog-backend
     ports:
       - "8088:3000"
+    volumes:
+      - /opt/blog/data:/app/data
     env_file:
       - .env
     restart: always
@@ -80,7 +82,8 @@ If you don't want to use docker-compose, you can run the following command direc
 docker run -d \
   --name blog-backend \
   -p 8088:3000 \
-  -e DATABASE_URL="sqlite.db" \
+  -v /opt/blog/data:/app/data \
+  -e DATABASE_URL="/app/data/sqlite.db" \
   -e JWT_SECRET="your_jwt_secret_key" \
   -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \
