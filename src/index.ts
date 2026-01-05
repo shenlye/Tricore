@@ -62,7 +62,6 @@ app.use(
     honoLogger((str) => logger.info(str)),
 );
 
-
 // 初始化默认管理员用户
 await seedDefaultUser();
 

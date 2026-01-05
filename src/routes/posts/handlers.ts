@@ -109,8 +109,12 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     let slug = providedSlug;
     if (!slug) {
         const datePrefix = new Date().toISOString().split("T")[0]; // 2026-01-05
-        const shortId = Math.random().toString(36).substring(2, 8); // 随机 6 位字符
-        slug = `${datePrefix}-${shortId}`;
+
+        // Math.random() is not suitable for generating unique identifiers
+        const randomPart = Buffer.from(
+            crypto.getRandomValues(new Uint8Array(4)),
+        ).toString("hex");
+        slug = `${datePrefix}-${randomPart}`;
     }
 
     const existingPost = await db.query.posts.findFirst({
@@ -189,6 +193,9 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
         category,
         postsToTags,
         categoryId: _categoryId,
+        authorId: _authorId,
+        createdAt,
+        updatedAt,
         ...cleanResult
     } = result;
 
@@ -197,10 +204,10 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
             success: true,
             data: {
                 ...cleanResult,
-                categories: result.category ? [result.category.name] : [],
-                tags: result.postsToTags.map((pt) => pt.tag.name),
-                createdAt: result.createdAt.toISOString(),
-                updatedAt: result.updatedAt.toISOString(),
+                categories: category ? [category.name] : [],
+                tags: postsToTags.map((pt) => pt.tag.name),
+                createdAt: createdAt.toISOString(),
+                updatedAt: updatedAt.toISOString(),
             },
         },
         201,
