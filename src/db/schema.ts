@@ -1,32 +1,80 @@
-import { boolean, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import {
+    index,
+    integer,
+    primaryKey,
+    sqliteTable,
+    text,
+} from "drizzle-orm/sqlite-core";
 
-export const posts = pgTable("posts", {
-    id: serial("id").primaryKey(),
-    title: text("title").notNull(),
-    content: text("content").notNull(),
-    description: text("description"),
-    slug: text("slug").notNull().unique(),
-    categories: text("categories").array().notNull().default([]),
-    tags: text("tags").array().notNull().default([]),
-    cover: text("cover"),
-    isPublished: boolean("isPublished").notNull().default(false),
-
-    createdAt: timestamp("createdAt").notNull().defaultNow(),
-    updatedAt: timestamp("updatedAt")
-        .notNull()
-        .defaultNow()
-        .$onUpdate(() => new Date()),
-});
-
-export const users = pgTable("users", {
-    id: serial("id").primaryKey(),
+export const users = sqliteTable("users", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
     role: text("role").notNull().default("user"),
     username: text("username").notNull().unique(),
     email: text("email").notNull().unique(),
     passwordHash: text("passwordHash").notNull(),
-    createdAt: timestamp("createdAt").notNull().defaultNow(),
-    updatedAt: timestamp("updatedAt")
+    createdAt: integer("createdAt", { mode: "timestamp" })
         .notNull()
-        .defaultNow()
+        .default(sql`(unixepoch())`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`)
         .$onUpdate(() => new Date()),
 });
+
+export const posts = sqliteTable(
+    "posts",
+    {
+        id: integer("id").primaryKey({ autoIncrement: true }),
+        title: text("title"),
+        description: text("description"),
+        slug: text("slug").unique(),
+        content: text("content").notNull(),
+        cover: text("cover"),
+        isPublished: integer("isPublished", { mode: "boolean" })
+            .notNull()
+            .default(false),
+        categoryId: integer("category_id").references(() => categories.id, {
+            onDelete: "set null",
+        }),
+        authorId: integer("authorId").references(() => users.id, {
+            onDelete: "set null",
+        }),
+
+        createdAt: integer("createdAt", { mode: "timestamp" })
+            .notNull()
+            .default(sql`(unixepoch())`),
+        updatedAt: integer("updatedAt", { mode: "timestamp" })
+            .notNull()
+            .default(sql`(unixepoch())`)
+            .$onUpdate(() => new Date()),
+    },
+    (t) => [
+        index("created_at_idx").on(t.createdAt),
+        index("category_id_idx").on(t.categoryId),
+    ],
+);
+
+export const tags = sqliteTable("tags", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull().unique(),
+});
+
+export const categories = sqliteTable("categories", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull().unique(),
+    slug: text("slug").notNull().unique(),
+});
+
+export const postsToTags = sqliteTable(
+    "posts_to_tags",
+    {
+        postId: integer("post_id")
+            .notNull()
+            .references(() => posts.id, { onDelete: "cascade" }),
+        tagId: integer("tag_id")
+            .notNull()
+            .references(() => tags.id, { onDelete: "cascade" }),
+    },
+    (t) => [primaryKey({ columns: [t.postId, t.tagId] })],
+);

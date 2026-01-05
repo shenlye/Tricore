@@ -10,7 +10,7 @@ English version: [README_EN.md](README_EN.md)
 - Hono - Web 框架
 - Drizzle ORM - 数据库 ORM
 - Biome - 代码格式化和检查
-- PostgreSQL- 数据库
+- SQLite - 数据库 (使用 Bun 内置驱动)
 - pino - 日志
 
 ## 本地开发
@@ -32,7 +32,7 @@ DEFAULT_ADMIN_PASSWORD=your_default_admin_password
 ```
 
 说明：
-- `DATABASE_URL`: PostgreSQL 数据库连接字符串
+- `DATABASE_URL`: SQLite 数据库文件路径 (例如 `sqlite.db`)
 - `JWT_SECRET`: 用于生成和验证 JWT Token 的密钥
 - `DEFAULT_ADMIN_PASSWORD`: 首次启动时自动创建的管理员账号 (admin) 的密码
 
@@ -83,7 +83,7 @@ docker compose up -d
 docker run -d \
   --name blog-backend \
   -p 8088:3000 \
-  -e DATABASE_URL="your_postgresql_url" \
+  -e DATABASE_URL="sqlite.db" \
   -e JWT_SECRET="your_jwt_secret_key" \
   -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \

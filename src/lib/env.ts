@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-    DATABASE_URL: z.url(),
+    DATABASE_URL: z.string().default("sqlite.db"),
     JWT_SECRET: z.string().min(16, "JWT_SECRET 必须至少 16 位以保证安全"),
     DEFAULT_ADMIN_PASSWORD: z.string().min(8),
     NODE_ENV: z

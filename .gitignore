@@ -16,3 +16,5 @@ node_modules/
 # Bun 运行时相关
 bun.lockb
 .DS_Store
+
+*.db

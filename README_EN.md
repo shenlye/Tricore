@@ -8,7 +8,7 @@ A blog backend API based on Bun + Hono.
 - Hono - Web framework
 - Drizzle ORM - Database ORM
 - Biome - Code formatter and linter
-- PostgreSQL - Database
+- SQLite - Database (using Bun's built-in driver)
 
 ## Local Development
 
@@ -29,7 +29,7 @@ DEFAULT_ADMIN_PASSWORD=your_default_admin_password
 ```
 
 Description:
-- `DATABASE_URL`: PostgreSQL database connection string
+- `DATABASE_URL`: SQLite database file path (e.g., `sqlite.db`)
 - `JWT_SECRET`: Secret key for generating and verifying JWT tokens
 - `DEFAULT_ADMIN_PASSWORD`: Password for the default admin account created on first run
 
@@ -80,7 +80,7 @@ If you don't want to use docker-compose, you can run the following command direc
 docker run -d \
   --name blog-backend \
   -p 8088:3000 \
-  -e DATABASE_URL="your_postgresql_url" \
+  -e DATABASE_URL="sqlite.db" \
   -e JWT_SECRET="your_jwt_secret_key" \
   -e DEFAULT_ADMIN_PASSWORD="your_admin_password" \
   --restart always \

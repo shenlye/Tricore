@@ -1,10 +1,12 @@
+import { Database } from "bun:sqlite";
 import { count, eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 import { env } from "../lib/env";
 import { logger } from "../lib/logger";
 import { users } from "./schema";
 
-export const db = drizzle(env.DATABASE_URL);
+const sqlite = new Database(env.DATABASE_URL);
+export const db = drizzle(sqlite);
 
 export const seedDefaultUser = async () => {
     try {
