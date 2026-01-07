@@ -1,85 +1,15 @@
-import { and, count, eq, inArray } from "drizzle-orm";
-import { pinyin } from "pinyin-pro";
+import { and, count, eq } from "drizzle-orm";
 import type { DB } from "../db";
-import { categories, posts, postsToTags, tags } from "../db/schema";
+import { posts } from "../db/schema";
+import type { CategoryService } from "./categories";
+import type { TagService } from "./tags";
 
 export class PostService {
-    constructor(private db: DB) {}
-
-    private async getOrCreateCategory(name: string) {
-        const existing = await this.db.query.categories.findFirst({
-            where: eq(categories.name, name),
-        });
-        if (existing) {
-            return existing.id;
-        }
-
-        // chinese to pinyin slug
-        const slug = pinyin(name, { toneType: "none" })
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^\w-]+/g, "");
-        const inserted = await this.db
-            .insert(categories)
-            .values({ name, slug })
-            .returning();
-        return inserted[0].id;
-    }
-
-    private async syncTags(postId: number, tagNames: string[]) {
-        const uniqueTagNames = Array.from(new Set(tagNames));
-
-        // 使用事务保证数据一致性
-        await this.db.transaction(async (tx) => {
-            // 如果没有标签，删除所有关联并且退出
-            if (uniqueTagNames.length === 0) {
-                await tx
-                    .delete(postsToTags)
-                    .where(eq(postsToTags.postId, postId));
-                return;
-            } else {
-                await tx
-                    .insert(tags)
-                    .values(
-                        uniqueTagNames.map((tagName) => ({ name: tagName })),
-                        // 如果标签已存在则什么都不做
-                    )
-                    .onConflictDoNothing();
-            }
-
-            // 获取所有标签的 ID
-            const allTags = await tx.query.tags.findMany({
-                where: inArray(tags.name, uniqueTagNames),
-            });
-            const tagIds = allTags.map((tag) => tag.id);
-
-            // 先删再增
-            await tx.delete(postsToTags).where(eq(postsToTags.postId, postId));
-
-            if (tagIds.length > 0) {
-                await tx.insert(postsToTags).values(
-                    tagIds.map((tagId) => ({
-                        postId,
-                        tagId,
-                    })),
-                );
-            }
-        });
-        // 不要在循环里查询
-        // for (const tagName of uniqueTagNames) {
-        //     let tag = await this.db.query.tags.findFirst({
-        //         where: eq(tags.name, tagName),
-        //     });
-        //     if (!tag) {
-        //         const inserted = await this.db
-        //             .insert(tags)
-        //             .values({ name: tagName })
-        //             .returning();
-        //         tag = inserted[0];
-        //     }
-        //     tagIds.push(tag.id);
-        // }
-    }
+    constructor(
+        private db: DB,
+        private categoryService: CategoryService,
+        private tagService: TagService,
+    ) {}
 
     async getPostBySlug(slug: string) {
         return await this.db.query.posts.findFirst({
@@ -141,7 +71,7 @@ export class PostService {
 
         let categoryId: number | undefined;
         if (category) {
-            categoryId = await this.getOrCreateCategory(category);
+            categoryId = await this.categoryService.getOrCreate(category);
         }
 
         const inserted = await this.db
@@ -157,7 +87,7 @@ export class PostService {
         }
 
         if (tagNames) {
-            await this.syncTags(newPost.id, tagNames);
+            await this.tagService.syncTags(newPost.id, tagNames);
         }
 
         return await this.db.query.posts.findFirst({
@@ -186,7 +116,7 @@ export class PostService {
 
         if (category !== undefined) {
             updateData.categoryId = category
-                ? await this.getOrCreateCategory(category)
+                ? await this.categoryService.getOrCreate(category)
                 : null;
         }
 
@@ -195,7 +125,7 @@ export class PostService {
         }
 
         if (tagNames !== undefined) {
-            await this.syncTags(id, tagNames);
+            await this.tagService.syncTags(id, tagNames);
         }
 
         return await this.db.query.posts.findFirst({
