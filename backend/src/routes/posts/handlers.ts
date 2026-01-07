@@ -169,13 +169,15 @@ export const createPostHandler: RouteHandler<typeof createPostRoute> = async (
     );
 };
 
+type UpdatePostResult = Awaited<ReturnType<typeof postService.updatePost>>;
+
 export const updatePostHandler: RouteHandler<typeof updatePostRoute> = async (
     c,
 ) => {
     const { id } = c.req.valid("param");
     const values = c.req.valid("json");
 
-    let result: any;
+    let result: UpdatePostResult;
     try {
         result = await postService.updatePost(id, values);
     } catch (e) {

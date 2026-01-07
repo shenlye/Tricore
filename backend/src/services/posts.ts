@@ -31,26 +31,27 @@ export class PostService {
 
         // 使用事务保证数据一致性
         await this.db.transaction(async (tx) => {
-
             // 如果没有标签，删除所有关联并且退出
             if (uniqueTagNames.length === 0) {
                 await tx
                     .delete(postsToTags)
                     .where(eq(postsToTags.postId, postId));
                 return;
-            }
-            else {
-                await tx.insert(tags).values(
-                    uniqueTagNames.map((tagName) => ({ name: tagName })),
-                // 如果标签已存在则什么都不做
-                ).onConflictDoNothing(); 
+            } else {
+                await tx
+                    .insert(tags)
+                    .values(
+                        uniqueTagNames.map((tagName) => ({ name: tagName })),
+                        // 如果标签已存在则什么都不做
+                    )
+                    .onConflictDoNothing();
             }
 
             // 获取所有标签的 ID
             const allTags = await tx.query.tags.findMany({
-                where: inArray(tags.name, uniqueTagNames)
-            })
-            const tagIds = allTags.map(tag => tag.id);
+                where: inArray(tags.name, uniqueTagNames),
+            });
+            const tagIds = allTags.map((tag) => tag.id);
 
             // 先删再增
             await tx.delete(postsToTags).where(eq(postsToTags.postId, postId));
