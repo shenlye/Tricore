@@ -37,7 +37,9 @@ bun run dev
 
 服务默认运行在 http://localhost:3000
 
-## Docker Run 运行
+## Docker 部署
+
+### Docker Run 运行
 
 ```bash
 docker run -d \
@@ -46,6 +48,32 @@ docker run -d \
   -v /opt/blog-backend/data:/app/data \
   --restart always \
   ghcr.io/shenlye/my-api:latest
+```
+
+### Docker Compose 运行
+
+```bash
+docker-compose up -d
+```
+
+`docker-compose.yml` 配置示例：
+
+```yaml
+services:
+  blog-admin:
+    image: ghcr.io/shenlye/my-api:latest
+    container_name: blog-admin
+    ports:
+      - "8088:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      DATABASE_URL: /app/data/sqlite.db
+      JWT_SECRET: your_jwt_secret_key
+      DEFAULT_ADMIN_PASSWORD: admin123456
+      ALLOWED_ORIGINS: http://localhost:5173
+      PORT: 3000
+    restart: always
 ```
 
 ### 环境变量

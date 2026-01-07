@@ -35,7 +35,9 @@ bun run dev
 
 Server runs at http://localhost:3000 by default.
 
-## Docker Deployment (Docker Run)
+## Docker Deployment
+
+### Docker Run
 
 ```bash
 docker run -d \
@@ -44,6 +46,32 @@ docker run -d \
   -v /opt/blog-backend/data:/app/data \
   --restart always \
   ghcr.io/shenlye/my-api:latest
+```
+
+### Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+Example `docker-compose.yml`:
+
+```yaml
+services:
+  blog-admin:
+    image: ghcr.io/shenlye/my-api:latest
+    container_name: blog-admin
+    ports:
+      - "8088:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      DATABASE_URL: /app/data/sqlite.db
+      JWT_SECRET: your_jwt_secret_key
+      DEFAULT_ADMIN_PASSWORD: admin123456
+      ALLOWED_ORIGINS: http://localhost:5173
+      PORT: 3000
+    restart: always
 ```
 
 ### Environment Variables
