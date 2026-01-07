@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'package.json'
+      - 'Dockerfile'
   workflow_dispatch:
-  paths:
-    - 'backend/**'
-    - 'frontend/**'
-    - 'package.json'
-    - 'Dockerfile'
 
 jobs:
   build:
