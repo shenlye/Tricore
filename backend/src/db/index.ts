@@ -23,6 +23,15 @@ export const seedDefaultUser = async () => {
                 "admin user not found. Initializing default admin user...",
             );
 
+            if (env.DEFAULT_ADMIN_PASSWORD === "admin123456") {
+                logger.warn(`\n${"=".repeat(50)}`);
+                logger.warn("SECURITY WARNING: Using default admin password.");
+                logger.warn(
+                    "Please change the password immediately after first login!",
+                );
+                logger.warn(`${"=".repeat(50)}\n`);
+            }
+
             const passwordHash = await Bun.password.hash(
                 env.DEFAULT_ADMIN_PASSWORD,
             );
@@ -37,24 +46,10 @@ export const seedDefaultUser = async () => {
                 })
                 .onConflictDoNothing();
 
-            logger.warn(`${"=".repeat(50)}`);
-            logger.warn("SECURITY NOTICE: Default admin created.");
-            logger.warn("Username: admin");
-            logger.warn(
-                "Password: [As defined in your DEFAULT_ADMIN_PASSWORD]",
-            );
-            logger.warn(`${"=".repeat(50)}\n`);
-
-            logger.info(
-                {
-                    user: {
-                        username: "admin",
-                        role: "admin",
-                        source: "DEFAULT_ADMIN_PASSWORD env var",
-                    },
-                },
-                "✅ Default admin account initialized successfully.",
-            );
+            logger.info(`${"=".repeat(50)}`);
+            logger.info("Default admin account initialized successfully.");
+            logger.info("Username: admin");
+            logger.info(`${"=".repeat(50)}`);
         }
     } catch (error) {
         logger.error(error, "Failed to seed default user");
