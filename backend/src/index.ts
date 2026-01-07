@@ -37,9 +37,9 @@ app.use(
 app.use(
     "*",
     cors({
-        origin: env.ALLOWED_ORIGINS.split(","),
+        origin: env.ALLOWED_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean),
 
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
         allowHeaders: ["Content-Type", "Authorization"],
 
