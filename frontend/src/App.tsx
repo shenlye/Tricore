@@ -2,12 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { client } from "@/lib/api";
 export default function App() {
@@ -95,7 +90,9 @@ export default function App() {
 					<div className="w-full max-w-sm">
 						<Card className="border-none shadow-none bg-transparent">
 							<CardHeader className="px-0 pt-0">
-								<CardTitle className="text-2xl font-bold tracking-tight">Login</CardTitle>
+								<CardTitle className="text-2xl font-bold tracking-tight">
+									Login
+								</CardTitle>
 							</CardHeader>
 							<CardContent className="px-0">
 								<form className="grid gap-6" onSubmit={handleSubmit}>
