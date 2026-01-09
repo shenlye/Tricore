@@ -1,10 +1,11 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { AuthGuard } from "@/components/auth-guard";
-import {
-	SidebarProvider,
-	SidebarTrigger,
-} from "@/components/ui/sidebar";
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+export default function DashboardLayout({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
 	return (
 		<AuthGuard>
 			<SidebarProvider>

@@ -6,69 +6,69 @@ import { env } from "../lib/env";
 import { logger } from "../lib/logger";
 
 const jwtMiddleware = jwt({
-    secret: env.JWT_SECRET,
+	secret: env.JWT_SECRET,
 });
 
 export const authMiddleware = createMiddleware(
-    async (c: Context, next: Next) => {
-        try {
-            return await jwtMiddleware(c, next);
-        } catch (e) {
-            logger.error({ err: e }, "JWT Verification Failed");
+	async (c: Context, next: Next) => {
+		try {
+			return await jwtMiddleware(c, next);
+		} catch (e) {
+			logger.error({ err: e }, "JWT Verification Failed");
 
-            return c.json(
-                {
-                    success: false,
-                    error: {
-                        code: "UNAUTHORIZED",
-                        message: "Unauthorized",
-                    },
-                },
-                401,
-            );
-        }
-    },
+			return c.json(
+				{
+					success: false,
+					error: {
+						code: "UNAUTHORIZED",
+						message: "Unauthorized",
+					},
+				},
+				401,
+			);
+		}
+	},
 );
 
 const payloadSchema = z.object({
-    sub: z.number(),
-    role: z.enum(["admin", "user"]),
-    exp: z.number(),
+	sub: z.number(),
+	role: z.enum(["admin", "user"]),
+	exp: z.number(),
 });
 
 export const adminMiddleware = createMiddleware(
-    async (c: Context, next: Next) => {
-        const payload = c.get("jwtPayload");
+	async (c: Context, next: Next) => {
+		const payload = c.get("jwtPayload");
 
-        const result = payloadSchema.safeParse(payload);
-        if (!result.success) {
-            return c.json(
-                {
-                    success: false,
-                    error: {
-                        code: "UNAUTHORIZED",
-                        message: "Unauthorized: Invalid session",
-                    },
-                },
-                401,
-            );
-        }
+		const result = payloadSchema.safeParse(payload);
+		if (!result.success) {
+			return c.json(
+				{
+					success: false,
+					error: {
+						code: "UNAUTHORIZED",
+						message: "Unauthorized: Invalid session",
+					},
+				},
+				401,
+			);
+		}
 
-        if (result.data.role !== "admin") {
-            return c.json(
-                {
-                    success: false,
-                    error: {
-                        code: "FORBIDDEN",
-                        message: "Forbidden: Admin access required",
-                    },
-                },
-                403,
-            );
-        }
+		if (result.data.role !== "admin") {
+			return c.json(
+				{
+					success: false,
+					error: {
+						code: "FORBIDDEN",
+						message: "Forbidden: Admin access required",
+					},
+				},
+				403,
+			);
+		}
 
-        c.set("user", result.data);
+		c.set("user", result.data);
 
-        await next();
-    },
+		await next();
+	},
 );

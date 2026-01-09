@@ -26,7 +26,12 @@ export function AppSidebar() {
 						{items.map((item) => {
 							const isActive = pathname === item.url;
 							return (
-								<SidebarMenuItem key={item.title} className={isActive ? "bg-primary text-primary-foreground" : ""}>
+								<SidebarMenuItem
+									key={item.title}
+									className={
+										isActive ? "bg-primary text-primary-foreground" : ""
+									}
+								>
 									<SidebarMenuButton asChild className="rounded-none">
 										<a href={item.url}>
 											<item.icon />

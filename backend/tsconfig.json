@@ -1,14 +1,14 @@
 {
-    "compilerOptions": {
-        "module": "ESNext",
-        "target": "ESNext",
-        "moduleResolution": "bundler",
-        "strict": true,
-        "jsx": "react-jsx",
-        "jsxImportSource": "hono/jsx",
-        "skipLibCheck": true,
-        "types": ["bun", "node"],
-        "lib": ["ESNext", "DOM", "DOM.Iterable"]
-    },
-    "exclude": ["node_modules"]
+	"compilerOptions": {
+		"module": "ESNext",
+		"target": "ESNext",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"jsx": "react-jsx",
+		"jsxImportSource": "hono/jsx",
+		"skipLibCheck": true,
+		"types": ["bun", "node"],
+		"lib": ["ESNext", "DOM", "DOM.Iterable"]
+	},
+	"exclude": ["node_modules"]
 }
