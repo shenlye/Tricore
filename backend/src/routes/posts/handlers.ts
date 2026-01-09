@@ -49,6 +49,7 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
 		limit: limitStr,
 		type,
 		category,
+		tag,
 	} = c.req.valid("query");
 	const page = Math.max(1, Number(pageStr) || 1);
 	const limit = Math.min(20, Math.max(1, Number(limitStr) || 10));
@@ -58,6 +59,7 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (
 		limit,
 		type,
 		category,
+		tag,
 	);
 
 	return c.json(

@@ -86,4 +86,8 @@ export const paginationSchema = z.object({
 		example: "tech",
 		description: "根据分类 Slug 筛选",
 	}),
+	tag: z.string().optional().openapi({
+		example: "hono",
+		description: "根据标签名称筛选",
+	}),
 });

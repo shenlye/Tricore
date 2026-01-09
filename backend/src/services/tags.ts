@@ -1,9 +1,29 @@
-import { eq, inArray } from "drizzle-orm";
+import { count, eq, inArray } from "drizzle-orm";
 import type { DB } from "../db";
 import { postsToTags, tags } from "../db/schema";
 
 class TagService {
 	constructor(private db: DB) {}
+
+	async listAllWithCount() {
+		return await this.db
+			.select({
+				id: tags.id,
+				name: tags.name,
+				postCount: count(postsToTags.postId),
+			})
+			.from(tags)
+			.leftJoin(postsToTags, eq(tags.id, postsToTags.tagId))
+			.groupBy(tags.id)
+			.orderBy(tags.name);
+	}
+
+	async getByName(name: string) {
+		return await this.db.query.tags.findFirst({
+			where: eq(tags.name, name),
+		});
+	}
+
 	async syncTags(postId: number, tagNames: string[]) {
 		const uniqueTagNames = Array.from(new Set(tagNames));
 

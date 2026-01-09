@@ -15,12 +15,13 @@ describe("Category and Filtering tests", () => {
 	beforeAll(async () => {
 		// Ensure admin user exists
 		const passwordHash = await Bun.password.hash("admin123");
+		const username = `catadmin-${Bun.randomUUIDv7().slice(-12)}`;
 		await db
 			.insert(users)
 			.values({
 				role: "admin",
-				username: `catadmin-${Bun.randomUUIDv7().slice(-12)}`,
-				email: `catadmin-${Bun.randomUUIDv7().slice(-12)}@example.com`,
+				username: username,
+				email: `${username}@example.com`,
 				passwordHash: passwordHash,
 			})
 			.onConflictDoNothing();
@@ -30,13 +31,14 @@ describe("Category and Filtering tests", () => {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				identifier: "catadmin",
+				identifier: username,
 				password: "admin123",
 			}),
 		});
-		// Fallback to testadmin if catadmin fails (from previous tests)
+
 		let loginData = await loginRes.json();
 		if (!loginData.success) {
+			// Fallback to testadmin if the above fails
 			const loginRes2 = await app.request("/api/v1/auth/login", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -47,6 +49,13 @@ describe("Category and Filtering tests", () => {
 			});
 			loginData = await loginRes2.json();
 		}
+
+		if (!loginData.success || !loginData.data?.token) {
+			throw new Error(
+				`Login failed in beforeAll: ${JSON.stringify(loginData)}`,
+			);
+		}
+
 		adminToken = loginData.data.token;
 
 		// Create some posts with different categories

@@ -1,7 +1,7 @@
-import { and, count, eq, isNull, sql } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
 import { pinyin } from "pinyin-pro";
 import type { DB } from "../db";
-import { posts } from "../db/schema";
+import { posts, postsToTags } from "../db/schema";
 import type { CategoryService } from "./categories";
 import type { TagService } from "./tags";
 
@@ -54,12 +54,23 @@ export class PostService {
 		limit: number,
 		type?: "post" | "memo",
 		categorySlug?: string,
+		tagName?: string,
 	) {
 		let categoryId: number | undefined;
 		if (categorySlug) {
 			const category = await this.categoryService.getBySlug(categorySlug);
 			if (category) {
 				categoryId = category.id;
+			} else {
+				return { data: [], total: 0 };
+			}
+		}
+
+		let tagId: number | undefined;
+		if (tagName) {
+			const tag = await this.tagService.getByName(tagName);
+			if (tag) {
+				tagId = tag.id;
 			} else {
 				return { data: [], total: 0 };
 			}
@@ -72,30 +83,57 @@ export class PostService {
 			categoryId ? eq(posts.categoryId, categoryId) : undefined,
 		);
 
-		const [data, total] = await Promise.all([
-			this.db.query.posts.findMany({
-				where: whereClause,
-				limit: limit,
-				offset: (page - 1) * limit,
-				columns: {
-					content: false,
-				},
-				with: {
-					category: true,
-					postsToTags: {
-						with: {
-							tag: true,
-						},
+		const baseQuery = this.db
+			.select({ id: posts.id })
+			.from(posts)
+			.where(whereClause);
+
+		if (tagId) {
+			baseQuery.innerJoin(
+				postsToTags,
+				and(eq(postsToTags.postId, posts.id), eq(postsToTags.tagId, tagId)),
+			);
+		}
+
+		const totalResult = await this.db
+			.select({ count: count() })
+			.from(baseQuery.as("subquery"));
+		const total = Number(totalResult[0].count);
+
+		const finalWhereClause = tagId
+			? and(
+					whereClause,
+					inArray(
+						posts.id,
+						this.db
+							.select({ postId: postsToTags.postId })
+							.from(postsToTags)
+							.where(eq(postsToTags.tagId, tagId)),
+					),
+				)
+			: whereClause;
+
+		const data = await this.db.query.posts.findMany({
+			where: finalWhereClause,
+			limit: limit,
+			offset: (page - 1) * limit,
+			columns: {
+				content: false,
+			},
+			with: {
+				category: true,
+				postsToTags: {
+					with: {
+						tag: true,
 					},
 				},
-				orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-			}),
-			this.db.select({ count: count() }).from(posts).where(whereClause),
-		]);
+			},
+			orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+		});
 
 		return {
 			data,
-			total: Number(total[0].count),
+			total,
 		};
 	}
 
