@@ -49,11 +49,27 @@ export class PostService {
 		return `${datePrefix}-${randomPart}`;
 	}
 
-	async listPosts(page: number, limit: number, type?: "post" | "memo") {
+	async listPosts(
+		page: number,
+		limit: number,
+		type?: "post" | "memo",
+		categorySlug?: string,
+	) {
+		let categoryId: number | undefined;
+		if (categorySlug) {
+			const category = await this.categoryService.getBySlug(categorySlug);
+			if (category) {
+				categoryId = category.id;
+			} else {
+				return { data: [], total: 0 };
+			}
+		}
+
 		const whereClause = and(
 			eq(posts.isPublished, true),
 			isNull(posts.deletedAt),
 			type ? eq(posts.type, type) : undefined,
+			categoryId ? eq(posts.categoryId, categoryId) : undefined,
 		);
 
 		const [data, total] = await Promise.all([

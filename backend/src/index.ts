@@ -9,6 +9,7 @@ import { env } from "./lib/env";
 import { logger } from "./lib/logger";
 import { defaultHook } from "./lib/route-factory";
 import authRouter from "./routes/auth/index";
+import categoriesRouter from "./routes/categories/index";
 import postsRouter from "./routes/posts/index";
 
 const app = new OpenAPIHono({
@@ -39,7 +40,8 @@ app.use(
 
 const routes = app
 	.route("/api/v1/posts", postsRouter)
-	.route("/api/v1/auth", authRouter);
+	.route("/api/v1/auth", authRouter)
+	.route("/api/v1/categories", categoriesRouter);
 
 app.onError((err, c) => {
 	// JSON 多打了一个逗号，导致 JSON.parse 失败，抛出一个 Malformed JSON 错误

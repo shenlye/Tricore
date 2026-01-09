@@ -82,4 +82,8 @@ export const paginationSchema = z.object({
 		example: "post",
 		description: "过滤内容类型：post (文章) 或 memo (便签)",
 	}),
+	category: z.string().optional().openapi({
+		example: "tech",
+		description: "根据分类 Slug 筛选",
+	}),
 });

@@ -16,16 +16,27 @@ class CategoryService {
 		// chinese to pinyin slug
 		const slug = pinyin(name, { toneType: "none" })
 			.toLowerCase()
+			.replace(/[^a-z0-9\s-]/g, "") // Remove non-alphanumeric except spaces/hyphens
+			.trim()
 			.replace(/\s+/g, "-") // Replace spaces with -
-			.replace(/[^\w-]+/g, "") // Remove all non-word chars
-			.replace(/--+/g, "-") // Replace multiple - with single -
-			.replace(/^-+/, "") // Trim - from start of text
-			.replace(/-+$/, ""); // Trim - from end of text
+			.replace(/--+/g, "-"); // Replace multiple - with single -
 		const inserted = await this.db
 			.insert(categories)
 			.values({ name, slug })
 			.returning();
 		return inserted[0].id;
+	}
+
+	async listAll() {
+		return await this.db.query.categories.findMany({
+			orderBy: (categories, { asc }) => [asc(categories.name)],
+		});
+	}
+
+	async getBySlug(slug: string) {
+		return await this.db.query.categories.findFirst({
+			where: eq(categories.slug, slug),
+		});
 	}
 }
 
