@@ -235,9 +235,9 @@ export class PostService {
 	}
 
 	async existsBySlug(slug: string) {
-		const post = await this.db.query.posts.findFirst({
-			where: eq(posts.slug, slug),
-			columns: {
+			const post = await this.db.query.posts.findFirst({
+				where: and(eq(posts.slug, slug), isNull(posts.deletedAt)),
+				columns: {
 				id: true,
 			},
 		});
