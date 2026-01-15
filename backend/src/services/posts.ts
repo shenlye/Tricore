@@ -224,12 +224,13 @@ export class PostService {
 	}
 
 	async deletePost(id: number) {
-		return await this.db
-			.update(posts)
-			.set({
-				deletedAt: new Date(),
-				slug: sql`${posts.slug} || '_del_' || ${Date.now()}`,
-			})
+			const randomSuffix = Bun.randomUUIDv7().slice(0, 8);
+			return await this.db
+				.update(posts)
+				.set({
+					deletedAt: new Date(),
+					slug: sql`${posts.slug} || '_del_' || ${randomSuffix}`,
+				})
 			.where(eq(posts.id, id))
 			.returning();
 	}
