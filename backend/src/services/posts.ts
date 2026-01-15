@@ -76,12 +76,13 @@ export class PostService {
 			}
 		}
 
-		const whereClause = and(
-			eq(posts.isPublished, true),
-			isNull(posts.deletedAt),
-			type ? eq(posts.type, type) : undefined,
-			categoryId ? eq(posts.categoryId, categoryId) : undefined,
-		);
+		const conditions = [
+		  eq(posts.isPublished, true),
+		  isNull(posts.deletedAt),
+		  ...(type ? [eq(posts.type, type)] : []),
+		  ...(categoryId ? [eq(posts.categoryId, categoryId)] : []),
+		];
+		const whereClause = and(...conditions);
 
 		const baseQuery = this.db
 			.select({ id: posts.id })
