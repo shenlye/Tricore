@@ -13,9 +13,22 @@ interface ApiError {
 	};
 }
 
+function isApiError(res: unknown): res is ApiError {
+	return (
+		typeof res === "object" &&
+		res !== null &&
+		"error" in res &&
+		typeof (res as ApiError).error === "object" &&
+		(res as ApiError).error !== null &&
+		"message" in (res as ApiError).error
+	);
+}
+
 export function parseBackendError(res: unknown): string {
-	const data = res as ApiError;
-	const err = data?.error;
+	if (!isApiError(res)) {
+		return "Unknown error";
+	}
+	const err = res.error;
 
 	if (err?.code === "VALIDATION_ERROR") {
 		return err.details?.[0]?.message ?? err.message;
