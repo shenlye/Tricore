@@ -1,10 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Edit,
+  MoreHorizontal,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -20,15 +28,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -62,92 +62,6 @@ export default function PostsPage() {
   });
 
   const totalPages = data?.meta ? Math.ceil(data.meta.total / limit) : 0;
-
-  const renderPaginationItems = () => {
-    const items = [];
-    const maxVisibleDays = 5;
-
-    if (totalPages <= maxVisibleDays) {
-      for (let i = 1; i <= totalPages; i++) {
-        items.push(
-          <PaginationItem key={i}>
-            <PaginationLink
-              onClick={() => setPage(i)}
-              isActive={page === i}
-              className="cursor-pointer"
-            >
-              {i}
-            </PaginationLink>
-          </PaginationItem>,
-        );
-      }
-    }
-    else {
-      // 始终显示第一页
-      items.push(
-        <PaginationItem key={1}>
-          <PaginationLink
-            onClick={() => setPage(1)}
-            isActive={page === 1}
-            className="cursor-pointer"
-          >
-            1
-          </PaginationLink>
-        </PaginationItem>,
-      );
-
-      if (page > 3) {
-        items.push(
-          <PaginationItem key="ellipsis-start">
-            <PaginationEllipsis />
-          </PaginationItem>,
-        );
-      }
-
-      // 显示当前页前后的页码
-      const start = Math.max(2, page - 1);
-      const end = Math.min(totalPages - 1, page + 1);
-
-      for (let i = start; i <= end; i++) {
-        if (i === 1 || i === totalPages)
-          continue;
-        items.push(
-          <PaginationItem key={i}>
-            <PaginationLink
-              onClick={() => setPage(i)}
-              isActive={page === i}
-              className="cursor-pointer"
-            >
-              {i}
-            </PaginationLink>
-          </PaginationItem>,
-        );
-      }
-
-      if (page < totalPages - 2) {
-        items.push(
-          <PaginationItem key="ellipsis-end">
-            <PaginationEllipsis />
-          </PaginationItem>,
-        );
-      }
-
-      // 始终显示最后一页
-      items.push(
-        <PaginationItem key={totalPages}>
-          <PaginationLink
-            onClick={() => setPage(totalPages)}
-            isActive={page === totalPages}
-            className="cursor-pointer"
-          >
-            {totalPages}
-          </PaginationLink>
-        </PaginationItem>,
-      );
-    }
-
-    return items;
-  };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -192,120 +106,148 @@ export default function PostsPage() {
           </Button>
         </div>
 
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>标题</TableHead>
-                  <TableHead>类型</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>发布时间</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading
+        <div className="border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>标题</TableHead>
+                <TableHead>类型</TableHead>
+                <TableHead>状态</TableHead>
+                <TableHead>发布时间</TableHead>
+                <TableHead className="text-right">操作</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading
+                ? (
+                    Array.from({ length: limit }).map((_, i) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <TableRow key={`skeleton-${i}`}>
+                        <TableCell colSpan={5} className="h-12">
+                          <Skeleton className="h-4 w-full" />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )
+                : data?.data?.length === 0
                   ? (
-                      Array.from({ length: 5 }).map((_, i) => (
-                        <TableRow key={i}>
-                          <TableCell colSpan={5} className="h-12">
-                            <div className="h-4 w-full animate-pulse bg-muted rounded" />
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                          暂无文章
+                        </TableCell>
+                      </TableRow>
+                    )
+                  : (
+                      data?.data?.map((post: any) => (
+                        <TableRow key={post.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex flex-col">
+                              <span>{post.title || "无标题"}</span>
+                              <span className="text-xs text-muted-foreground line-clamp-1">
+                                {post.slug || post.id}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">
+                              {post.type === "memo" ? "便签" : "文章"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {post.isPublished
+                              ? (
+                                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none shadow-none">已发布</Badge>
+                                )
+                              : (
+                                  <Badge variant="outline" className="text-amber-600 border-amber-200">草稿</Badge>
+                                )}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm">
+                            {new Date(post.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>操作</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => toast.info("编辑功能即将推出")}>
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  编辑
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={() => setDeleteId(post.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  删除
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ))
-                    )
-                  : data?.data?.length === 0
-                    ? (
-                        <TableRow>
-                          <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                            暂无文章
-                          </TableCell>
-                        </TableRow>
-                      )
-                    : (
-                        data?.data?.map((post: any) => (
-                          <TableRow key={post.id}>
-                            <TableCell className="font-medium">
-                              <div className="flex flex-col">
-                                <span>{post.title || "无标题"}</span>
-                                <span className="text-xs text-muted-foreground line-clamp-1">
-                                  {post.slug || post.id}
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="secondary">
-                                {post.type === "memo" ? "便签" : "文章"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {post.isPublished
-                                ? (
-                                    <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none shadow-none">已发布</Badge>
-                                  )
-                                : (
-                                    <Badge variant="outline" className="text-amber-600 border-amber-200">草稿</Badge>
-                                  )}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-sm">
-                              {new Date(post.createdAt).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon">
-                                    <MoreHorizontal className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>操作</DropdownMenuLabel>
-                                  <DropdownMenuItem onClick={() => toast.info("编辑功能即将推出")}>
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    编辑
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    className="text-destructive focus:text-destructive"
-                                    onClick={() => setDeleteId(post.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    删除
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-              </TableBody>
-            </Table>
-          </CardContent>
-          {!isLoading && totalPages > 1 && (
-            <div className="py-4 border-t">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => setPage(p => Math.max(1, p - 1))}
-                      className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-
-                  {renderPaginationItems()}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                      className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+                    )}
+            </TableBody>
+          </Table>
+          {!isLoading && totalPages > 0 && (
+            <div className="flex items-center justify-end space-x-6 py-4 border-t px-4">
+              <div className="text-sm text-muted-foreground font-medium">
+                Page
+                {" "}
+                {page}
+                {" "}
+                of
+                {" "}
+                {totalPages}
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(1)}
+                  disabled={page === 1}
+                  className="hidden sm:flex"
+                >
+                  <ChevronsLeft className="h-4 w-4 mr-1" />
+                  首页
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  上一页
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  下一页
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(totalPages)}
+                  disabled={page === totalPages}
+                  className="hidden sm:flex"
+                >
+                  末页
+                  <ChevronsRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </div>
           )}
-        </Card>
+        </div>
       </div>
-
       <Dialog open={deleteId !== null} onOpenChange={open => !open && setDeleteId(null)}>
         <DialogContent>
           <DialogHeader>
