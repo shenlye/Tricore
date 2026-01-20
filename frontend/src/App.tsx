@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import DashboardPage from "@/pages/dashboard/DashboardPage";
-import PostsPage from "@/pages/dashboard/PostsPage";
+import PostsPage from "@/pages/dashboard/posts";
 import LoginPage from "@/pages/LoginPage";
 
 export default function App() {
