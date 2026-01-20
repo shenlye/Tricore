@@ -4,8 +4,8 @@ import { listCategoriesHandler } from "./handlers";
 import { listCategoriesRoute } from "./routes";
 
 const categoriesRouter = new OpenAPIHono({ defaultHook }).openapi(
-	listCategoriesRoute,
-	listCategoriesHandler,
+  listCategoriesRoute,
+  listCategoriesHandler,
 );
 
 export default categoriesRouter;
