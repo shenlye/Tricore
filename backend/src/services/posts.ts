@@ -12,9 +12,14 @@ export class PostService {
     private tagService: TagService,
   ) {}
 
-  async getPostBySlug(slug: string) {
+  async getPostBySlug(slug: string, onlyPublished = true) {
+    const conditions = [eq(posts.slug, slug), isNull(posts.deletedAt)];
+    if (onlyPublished) {
+      conditions.push(eq(posts.isPublished, true));
+    }
+
     return await this.db.query.posts.findFirst({
-      where: and(eq(posts.slug, slug), eq(posts.isPublished, true), isNull(posts.deletedAt)),
+      where: and(...conditions),
       with: {
         category: true,
         postsToTags: {
@@ -65,6 +70,7 @@ export class PostService {
     type?: "post" | "memo",
     categorySlug?: string,
     tagName?: string,
+    onlyPublished = true,
   ) {
     let categoryId: number | undefined;
     if (categorySlug) {
@@ -89,11 +95,15 @@ export class PostService {
     }
 
     const conditions = [
-      eq(posts.isPublished, true),
       isNull(posts.deletedAt),
       ...(type ? [eq(posts.type, type)] : []),
       ...(categoryId ? [eq(posts.categoryId, categoryId)] : []),
     ];
+
+    if (onlyPublished) {
+      conditions.push(eq(posts.isPublished, true));
+    }
+
     const whereClause = and(...conditions);
 
     const baseQuery = this.db.select({ id: posts.id }).from(posts).where(whereClause);

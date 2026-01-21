@@ -5,6 +5,11 @@ export interface PostFormData {
   isPublished: boolean;
 }
 
+export interface CreatePostData extends PostFormData {
+  type: "post" | "memo";
+  content: string;
+}
+
 export interface Post {
   id: number;
   title: string | null;

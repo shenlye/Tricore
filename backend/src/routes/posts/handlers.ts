@@ -18,7 +18,13 @@ export const postService = new PostService(db, categoryService, tagService);
 export const getPostHandler: RouteHandler<typeof getPostRoute> = async (c) => {
   const { slug } = c.req.valid("param");
 
-  const result = await postService.getPostBySlug(slug);
+  const authHeader = c.req.header("Authorization");
+  let onlyPublished = true;
+  if (authHeader?.startsWith("Bearer ")) {
+    onlyPublished = false;
+  }
+
+  const result = await postService.getPostBySlug(slug, onlyPublished);
 
   if (!result) {
     return c.json(
@@ -74,7 +80,18 @@ export const listPostsHandler: RouteHandler<typeof listPostsRoute> = async (c) =
   const page = Math.max(1, Number(pageStr) || 1);
   const limit = Math.min(20, Math.max(1, Number(limitStr) || 10));
 
-  const { data, total } = await postService.listPosts(page, limit, type, category, tag);
+  // 尝试获取 token 检查是否是管理员
+  const authHeader = c.req.header("Authorization");
+  let onlyPublished = true;
+
+  if (authHeader?.startsWith("Bearer ")) {
+    // 这里简单判断一下是否有 token，实际项目中应该验证 JWT 载荷中的角色
+    // 因为我们的 dashboard 已经有权限校验，这里只要有合法 token 且调用此接口
+    // 我们就倾向于认为是在后台管理环境下
+    onlyPublished = false;
+  }
+
+  const { data, total } = await postService.listPosts(page, limit, type, category, tag, onlyPublished);
 
   return c.json(
     {

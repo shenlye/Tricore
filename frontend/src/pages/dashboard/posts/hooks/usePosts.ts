@@ -6,11 +6,14 @@ export function usePosts(page: number, limit: number) {
   return useQuery({
     queryKey: ["posts", page, limit],
     queryFn: async () => {
+      const token = localStorage.getItem("token");
       const res = await client.api.v1.posts.$get({
         query: {
           page: page.toString(),
           limit: limit.toString(),
         },
+      }, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!res.ok)
         throw new Error("Failed to fetch posts");
@@ -25,8 +28,11 @@ export function usePost(slug: string | undefined) {
     queryFn: async () => {
       if (!slug)
         return null;
+      const token = localStorage.getItem("token");
       const res = await client.api.v1.posts[":slug"].$get({
         param: { slug },
+      }, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!res.ok)
         throw new Error("Failed to fetch post details");
@@ -42,14 +48,48 @@ export function usePostById(id: number | undefined) {
     queryFn: async () => {
       if (id === undefined)
         return null;
+      const token = localStorage.getItem("token");
       const res = await client.api.v1.posts.id[":id"].$get({
         param: { id: id.toString() },
+      }, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!res.ok)
         throw new Error("Failed to fetch post details");
       return res.json();
     },
     enabled: id !== undefined,
+  });
+}
+
+export function useCreatePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (values: any) => {
+      const token = localStorage.getItem("token");
+      if (!token)
+        throw new Error("No token found");
+      const res = await client.api.v1.posts.$post({
+        json: values,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        const errorData = await res.json() as any;
+        throw new Error(errorData.error?.message || "Failed to create post");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast.success("文章已创建");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      toast.error(`创建失败: ${error.message}`);
+    },
   });
 }
 

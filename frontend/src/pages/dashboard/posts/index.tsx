@@ -2,13 +2,13 @@ import type { Post, PostFormData } from "./types";
 import type { MilkdownEditorRef } from "@/components/milkdown-editor";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "../layout";
 import { ContentEditorDialog } from "./ContentEditorDialog";
+import { CreatePostDialog } from "./CreatePostDialog";
 import { DeletePostDialog } from "./DeletePostDialog";
 import { EditPostDialog } from "./EditPostDialog";
-import { useDeletePost, usePostById, usePosts, useUpdatePost } from "./hooks/usePosts";
+import { useCreatePost, useDeletePost, usePostById, usePosts, useUpdatePost } from "./hooks/usePosts";
 import { PostsTable } from "./PostsTable";
 
 const POSTS_PER_PAGE = 10;
@@ -18,6 +18,7 @@ export default function PostsPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [contentEditPost, setContentEditPost] = useState<Post | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const editorRef = useRef<MilkdownEditorRef>(null);
 
@@ -26,6 +27,7 @@ export default function PostsPage() {
 
   const postId = editPost?.id ?? contentEditPost?.id ?? undefined;
   const { data: fullPost, isLoading: isLoadingPost } = usePostById(postId);
+  const createMutation = useCreatePost();
   const updateMutation = useUpdatePost();
   const deleteMutation = useDeletePost();
 
@@ -37,6 +39,24 @@ export default function PostsPage() {
     if (!open) {
       setEditPost(null);
     }
+  };
+
+  const handleCreatePost = (values: any) => {
+    const payload = {
+      ...values,
+      slug: values.slug || undefined,
+      title: values.title || undefined,
+      description: values.description || undefined,
+    };
+    createMutation.mutate(payload, {
+      onSuccess: (response) => {
+        setIsCreateDialogOpen(false);
+        // 创建成功后，自动打开内容编辑器
+        if (response.data) {
+          setContentEditPost(response.data as Post);
+        }
+      },
+    });
   };
 
   const handleSavePost = (values: PostFormData) => {
@@ -94,7 +114,7 @@ export default function PostsPage() {
           <h1 className="text-xl font-bold flex items-center gap-2">
             文章管理
           </h1>
-          <Button onClick={() => toast.info("创建文章功能即将推出")}>
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             新建文章
           </Button>
@@ -117,6 +137,13 @@ export default function PostsPage() {
         onOpenChange={open => !open && setDeleteId(null)}
         onConfirm={handleDeleteConfirm}
         isPending={deleteMutation.isPending}
+      />
+
+      <CreatePostDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSave={handleCreatePost}
+        isSaving={createMutation.isPending}
       />
 
       {editPost && (

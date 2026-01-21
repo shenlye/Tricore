@@ -53,6 +53,7 @@ export function PostsTable({
       <Table>
         <TableHeader className="bg-card">
           <TableRow>
+            <TableHead className="w-20">ID</TableHead>
             <TableHead>标题</TableHead>
             <TableHead>类型</TableHead>
             <TableHead>状态</TableHead>
@@ -66,7 +67,7 @@ export function PostsTable({
                 Array.from({ length: skeletonCount }).map((_, i) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`skeleton-${i}`}>
-                    <TableCell colSpan={5} className="h-12">
+                    <TableCell colSpan={6} className="h-12">
                       <Skeleton className="h-4 w-full" />
                     </TableCell>
                   </TableRow>
@@ -75,7 +76,7 @@ export function PostsTable({
             : posts?.length === 0
               ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                       暂无文章
                     </TableCell>
                   </TableRow>
@@ -83,6 +84,9 @@ export function PostsTable({
               : (
                   posts?.map(post => (
                     <TableRow key={post.id}>
+                      <TableCell className="text-muted-foreground font-mono text-xs">
+                        {post.id}
+                      </TableCell>
                       <TableCell className="font-medium">
                         <div className="flex flex-col">
                           <span>{post.title || "无标题"}</span>
