@@ -20,9 +20,6 @@ importers:
       '@react-three/fiber':
         specifier: ^9.5.0
         version: 9.5.0(@types/react@19.2.10)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(three@0.182.0)
-      '@types/three':
-        specifier: ^0.182.0
-        version: 0.182.0
       gsap:
         specifier: ^3.14.2
         version: 3.14.2
@@ -38,6 +35,9 @@ importers:
       three:
         specifier: ^0.182.0
         version: 0.182.0
+      three-stdlib:
+        specifier: ^2.36.1
+        version: 2.36.1(three@0.182.0)
     devDependencies:
       '@opennextjs/cloudflare':
         specifier: ^1.16.1
@@ -54,6 +54,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.2.10)
+      '@types/three':
+        specifier: ^0.182.0
+        version: 0.182.0
       babel-plugin-react-compiler:
         specifier: 1.0.0
         version: 1.0.0
