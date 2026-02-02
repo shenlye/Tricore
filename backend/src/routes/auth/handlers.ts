@@ -48,7 +48,8 @@ export function createRegisterHandler() {
     let userCount: number;
     try {
       userCount = await authService.countUsers();
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.message?.includes("no such table")) {
         return c.json(
           {

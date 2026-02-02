@@ -1,10 +1,7 @@
 import type { Env } from "./types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-import { count, eq } from "drizzle-orm";
 import { cors } from "hono/cors";
-import { createDb } from "./db";
-import { users } from "./db/schema";
 import { getAllowedOrigins, validateEnv } from "./lib/env";
 import { defaultHook } from "./lib/route-factory";
 import { servicesMiddleware } from "./middleware/services";
@@ -12,7 +9,6 @@ import { createAuthRouter } from "./routes/auth/index";
 import { createCategoriesRouter } from "./routes/categories/index";
 import { createPostsRouter } from "./routes/posts/index";
 import { createTagsRouter } from "./routes/tags/index";
-import { hashPassword } from "./services/auth";
 
 const app = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook,
