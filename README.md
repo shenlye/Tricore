@@ -1,82 +1,37 @@
-# My Simple Blog Admin
+# My API - Cloudflare Workers Blog System
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shenlye/my-api)
+自用的全栈博客/管理系统，基于 Cloudflare 基础设施。
 
-基于 Bun + Hono + React 19 的全栈博客管理系统。
+## 架构
 
-## 技术栈
-
-### 后端 (Backend)
-- **Runtime**: Bun
-- **Framework**: Hono + Zod OpenAPI
-- **ORM**: Drizzle ORM (SQLite)
-- **Auth**: JWT
-- **Linter**: ESLint (@antfu/config)
-
-### 前端 (Frontend)
-- **Framework**: React 19 + Vite
-- **UI Components**: Shadcn UI + Tailwind CSS 4
-- **Editor**: Milkdown Crepe
-- **Data Fetching**: TanStack Query v5
-- **Routing**: React Router 7
+- **后端 (Backend)**: Hono + Drizzle ORM + Cloudflare D1 (Database) + Cloudflare Workers（serverless）
+- **前端 (Frontend)**: React + Vite + Shadcn UI + Cloudflare Pages
+- **部署**: Cloudflare 全家桶 (Workers + D1 + Pages)
 
 ## 快速开始
 
-### 1. 安装依赖
-```bash
-bun install
-```
+### 后端 (Cloudflare Workers)
 
-### 2. 初始化数据库
-```bash
-bunx drizzle-kit push
-```
+1. **进入目录**: `cd backend`
+2. **安装依赖**: `pnpm install`
+3. **初始化数据库**:
+   ```bash
+   pnpm wrangler d1 create my-api-db
+   # 将返回的 database_id 填入 wrangler.toml
+   ```
+4. **设置密钥**:
+   ```bash
+   npx wrangler secret put JWT_SECRET
+   ```
+5. **部署**: `pnpm run deploy`
 
-### 3. 启动开发环境
-```bash
-bun run dev
-```
-后端默认运行在 `http://localhost:3000`，前端运行在 `http://localhost:5173`。
+### 前端 (Dashboard)
 
-## Docker 部署
+1. **进入目录**: `cd frontend`
+2. **安装依赖**: `pnpm install`
+3. **开发**: `pnpm run dev`
+4. **部署**: 推荐直接关联 GitHub 仓库部署到 Cloudflare Pages。
 
-### Docker Run 运行
-
-```bash
-docker run -d \
-  --name blog-admin \
-  -p 8088:3000 \
-  -v /opt/blog-backend/data:/app/data \
-  --restart always \
-  ghcr.io/shenlye/my-api:latest
-```
-
-### Docker Compose 运行
-
-```bash
-docker-compose up -d
-```
-
-`docker-compose.yml` 配置示例：
-
-```yaml
-services:
-  blog-admin:
-    image: ghcr.io/shenlye/my-api:latest
-    container_name: blog-admin
-    ports:
-      - "8088:3000"
-    volumes:
-      - ./data:/app/data
-    environment:
-      JWT_SECRET: your_secret
-      DEFAULT_ADMIN_PASSWORD: admin123456
-      ALLOWED_ORIGINS: http://your-domain.com
-    restart: always
-```
-
-## 环境变量
-- `DATABASE_URL`: SQLite 路径，默认 `/app/data/sqlite.db`
-- `JWT_SECRET`: JWT 密钥
-- `DEFAULT_ADMIN_PASSWORD`: 初始管理员密码 (账号: admin)
-- `ALLOWED_ORIGINS`: 允许的跨域域名
+## 环境变量 (Secret)
+- `JWT_SECRET`: 必须，用于身份验证。
+- `ALLOWED_ORIGINS`: 允许的跨域来源。

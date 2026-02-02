@@ -1,20 +1,22 @@
 import type { Context, Next } from "hono";
+import type { Env } from "../types";
 import { createMiddleware } from "hono/factory";
 import { jwt } from "hono/jwt";
 import { z } from "zod";
-import { env } from "../lib/env";
-import { logger } from "../lib/logger";
 
-const jwtMiddleware = jwt({
-  secret: env.JWT_SECRET,
-});
+export const authMiddleware = createMiddleware<{ Bindings: Env }>(async (c: Context, next: Next) => {
+  const jwtSecret = c.env.JWT_SECRET;
 
-export const authMiddleware = createMiddleware(async (c: Context, next: Next) => {
+  const jwtMiddleware = jwt({
+    secret: jwtSecret,
+    alg: "HS256",
+  });
+
   try {
     return await jwtMiddleware(c, next);
   }
   catch (e) {
-    logger.error({ err: e }, "JWT Verification Failed");
+    console.error("JWT Verification Failed:", e);
 
     return c.json(
       {

@@ -1,8 +1,15 @@
+import type { Env } from "../../types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { defaultHook } from "../../lib/route-factory";
-import { listTagsHandler } from "./handlers";
+import { createListTagsHandler } from "./handlers";
 import { listTagsRoute } from "./routes";
 
-const tagsRouter = new OpenAPIHono({ defaultHook }).openapi(listTagsRoute, listTagsHandler);
+export function createTagsRouter() {
+  const tagsRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
 
-export default tagsRouter;
+  tagsRouter.openapi(listTagsRoute, createListTagsHandler());
+
+  return tagsRouter;
+}
+
+export default createTagsRouter;

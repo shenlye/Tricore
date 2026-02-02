@@ -40,14 +40,15 @@ export const posts = sqliteTable(
     content: text("content").notNull(),
     cover: text("cover"),
     isPublished: integer("isPublished", { mode: "boolean" }).notNull().default(false),
-    categoryId: integer("category_id").references(() => categories.id, {
+    publishedAt: integer("publishedAt", { mode: "timestamp" }),
+    categoryId: integer("categoryId").references(() => categories.id, {
       onDelete: "set null",
     }),
     authorId: integer("authorId").references(() => users.id, {
       onDelete: "set null",
     }),
 
-    deletedAt: integer("deleted_at", { mode: "timestamp" }),
+    deletedAt: integer("deletedAt", { mode: "timestamp" }),
 
     createdAt: integer("createdAt", { mode: "timestamp" })
       .notNull()
@@ -58,19 +59,19 @@ export const posts = sqliteTable(
       .$onUpdate(() => new Date()),
   },
   t => [
-    index("created_at_idx").on(t.createdAt),
-    index("category_id_idx").on(t.categoryId),
-    index("is_published_idx").on(t.isPublished),
+    index("createdAtIdx").on(t.createdAt),
+    index("categoryIdIdx").on(t.categoryId),
+    index("isPublishedIdx").on(t.isPublished),
   ],
 );
 
 export const postsToTags = sqliteTable(
   "posts_to_tags",
   {
-    postId: integer("post_id")
+    postId: integer("postId")
       .notNull()
       .references(() => posts.id, { onDelete: "cascade" }),
-    tagId: integer("tag_id")
+    tagId: integer("tagId")
       .notNull()
       .references(() => tags.id, { onDelete: "cascade" }),
   },

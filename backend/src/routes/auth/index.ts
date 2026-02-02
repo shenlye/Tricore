@@ -1,43 +1,17 @@
+import type { Env } from "../../types";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { rateLimiter } from "hono-rate-limiter";
 import { defaultHook } from "../../lib/route-factory";
-import { changePasswordHandler, loginHandler } from "./handlers";
+import { createChangePasswordHandler, createLoginHandler } from "./handlers";
 import { changePasswordRoute, loginRoute } from "./routers";
 
-const authRouter = new OpenAPIHono({ defaultHook });
+export function createAuthRouter() {
+  const authRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
 
-authRouter.use(
-  "*",
-  rateLimiter({
-    windowMs: 15 * 60 * 1000,
-    limit: 10,
-    standardHeaders: "draft-7",
-    keyGenerator: (c) => {
-      const trustedIp = c.req.header("cf-connecting-ip") || c.req.header("x-real-ip");
-      if (trustedIp) {
-        return trustedIp;
-      }
+  authRouter
+    .openapi(loginRoute, createLoginHandler())
+    .openapi(changePasswordRoute, createChangePasswordHandler());
 
-      const xff = c.req.header("x-forwarded-for");
-      const ips = xff?.split(",");
-      const lastIp = ips?.[ips.length - 1]?.trim();
-      if (lastIp)
-        return lastIp;
+  return authRouter;
+}
 
-      return `${c.req.header("user-agent") ?? "unknown"}|${c.req.path}`;
-    },
-    message: {
-      success: false,
-      error: {
-        code: "TOO_MANY_REQUESTS",
-        message: "Too many requests, please try again later.",
-      },
-    },
-  }),
-);
-
-const routes = authRouter
-  .openapi(loginRoute, loginHandler)
-  .openapi(changePasswordRoute, changePasswordHandler);
-
-export default routes;
+export default createAuthRouter;

@@ -1,69 +1,44 @@
+import type { Env } from "./types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-import { serveStatic } from "hono/bun";
+import { count, eq } from "drizzle-orm";
 import { cors } from "hono/cors";
-import { HTTPException } from "hono/http-exception";
-import { logger as honoLogger } from "hono/logger";
-import { seedDefaultUser } from "./db";
-import { env } from "./lib/env";
-import { logger } from "./lib/logger";
+import { createDb } from "./db";
+import { users } from "./db/schema";
+import { getAllowedOrigins } from "./lib/env";
 import { defaultHook } from "./lib/route-factory";
-import authRouter from "./routes/auth/index";
-import categoriesRouter from "./routes/categories/index";
-import postsRouter from "./routes/posts/index";
-import tagsRouter from "./routes/tags/index";
+import { createAuthRouter } from "./routes/auth/index";
+import { createCategoriesRouter } from "./routes/categories/index";
+import { createPostsRouter } from "./routes/posts/index";
+import { createTagsRouter } from "./routes/tags/index";
+import { hashPassword } from "./services/auth";
 
-const app = new OpenAPIHono({
+const app = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook,
 });
 
-app.use(
-  "*",
-  honoLogger(str => logger.info(str)),
-);
+app.use("*", async (c, next) => {
+  const allowedOrigins = getAllowedOrigins(c.env);
 
-app.use(
-  "*",
-  cors({
-    origin: env.ALLOWED_ORIGINS.split(",")
-      .map(s => s.trim())
-      .filter(Boolean),
-
+  const corsMiddleware = cors({
+    origin: allowedOrigins,
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-
     allowHeaders: ["Content-Type", "Authorization"],
-
     credentials: true,
-
     maxAge: 600,
-  }),
-);
+  });
 
-const _routes = app
-  .route("/api/v1/posts", postsRouter)
-  .route("/api/v1/auth", authRouter)
-  .route("/api/v1/categories", categoriesRouter)
-  .route("/api/v1/tags", tagsRouter);
+  return corsMiddleware(c, next);
+});
+
+// 动态挂载路由
+app.route("/api/v1/posts", createPostsRouter());
+app.route("/api/v1/auth", createAuthRouter());
+app.route("/api/v1/categories", createCategoriesRouter());
+app.route("/api/v1/tags", createTagsRouter());
 
 app.onError((err, c) => {
-  // JSON 多打了一个逗号，导致 JSON.parse 失败，抛出一个 Malformed JSON 错误
-  // 既然解析都失败了，Hono 不知道这个请求有没有内容，所以无法交给 Zod 去验证，所以没触发 defaultHook
-  // 如果是 JSON 格式这类 HTTP 异常，保留原始状态码和错误信息
-  if (err instanceof HTTPException) {
-    return c.json(
-      {
-        success: false,
-        error: {
-          code: err.status.toString(),
-          message: err.message,
-        },
-      },
-      err.status,
-    );
-  }
-
-  // 真正的代码报错才走 500
-  logger.error(err);
+  console.error(err);
   return c.json(
     {
       success: false,
@@ -75,9 +50,6 @@ app.onError((err, c) => {
     500,
   );
 });
-
-// 初始化默认管理员用户
-await seedDefaultUser();
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   type: "http",
@@ -98,23 +70,8 @@ app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.use("/*", serveStatic({ root: "./public" }));
-app.get("*", async (c) => {
-  const file = Bun.file("./public/index.html");
-  if (await file.exists()) {
-    return c.html(await file.text());
-  }
-  return c.text("Not Found", 404);
-});
+export type AppType = typeof app;
 
-const port = env.PORT;
-logger.info(`Server starting on port ${port}...`);
-
-export type AppType = typeof _routes;
-
-export default {
-  port,
-  fetch: app.fetch,
-};
+export default app;
 
 export { app };

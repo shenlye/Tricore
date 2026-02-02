@@ -1,12 +1,13 @@
+import type { Env } from "../../types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { defaultHook } from "../../lib/route-factory";
 import {
-  createPostHandler,
-  deletePostHandler,
-  getPostByIdHandler,
-  getPostHandler,
-  listPostsHandler,
-  updatePostHandler,
+  createCreatePostHandler,
+  createDeletePostHandler,
+  createGetPostByIdHandler,
+  createGetPostHandler,
+  createListPostsHandler,
+  createUpdatePostHandler,
 } from "./handlers";
 import {
   createPostRoute,
@@ -17,12 +18,18 @@ import {
   updatePostRoute,
 } from "./routes";
 
-const postsRouter = new OpenAPIHono({ defaultHook })
-  .openapi(getPostRoute, getPostHandler)
-  .openapi(getPostByIdRoute, getPostByIdHandler)
-  .openapi(listPostsRoute, listPostsHandler)
-  .openapi(createPostRoute, createPostHandler)
-  .openapi(updatePostRoute, updatePostHandler)
-  .openapi(deletePostRoute, deletePostHandler);
+export function createPostsRouter() {
+  const postsRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
 
-export default postsRouter;
+  postsRouter
+    .openapi(getPostRoute, createGetPostHandler())
+    .openapi(getPostByIdRoute, createGetPostByIdHandler())
+    .openapi(listPostsRoute, createListPostsHandler())
+    .openapi(createPostRoute, createCreatePostHandler())
+    .openapi(updatePostRoute, createUpdatePostHandler())
+    .openapi(deletePostRoute, createDeletePostHandler());
+
+  return postsRouter;
+}
+
+export default createPostsRouter;

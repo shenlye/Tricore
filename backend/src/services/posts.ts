@@ -65,7 +65,7 @@ export class PostService {
     }
 
     const datePrefix = new Date().toISOString().split("T")[0];
-    const randomPart = Bun.randomUUIDv7().slice(0, 6);
+    const randomPart = crypto.randomUUID().slice(0, 6);
     return `${datePrefix}-${randomPart}`;
   }
 
@@ -245,7 +245,7 @@ export class PostService {
   }
 
   async deletePost(id: number) {
-    const randomSuffix = Bun.randomUUIDv7().slice(0, 8);
+    const randomSuffix = crypto.randomUUID().slice(0, 8);
     return await this.db
       .update(posts)
       .set({

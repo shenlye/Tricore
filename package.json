@@ -10,9 +10,6 @@
     "lint:frontend": "cd frontend && bun run lint",
     "lint:backend": "cd backend && bun run lint",
     "lint": "bun run lint:frontend && bun run lint:backend",
-    "dev": "bun run dev:frontend && bun run dev:backend",
-    "dev:frontend": "cd frontend && bun run dev",
-    "dev:backend": "cd backend && bun run dev",
     "format": "bun run format:frontend && bun run format:backend",
     "format:frontend": "cd frontend && bun run format",
     "format:backend": "cd backend && bun run format"

@@ -2,10 +2,97 @@ import type { DB } from "../db";
 import { eq, or } from "drizzle-orm";
 import { sign } from "hono/jwt";
 import { users } from "../db/schema";
-import { env } from "../lib/env";
+
+// Web Crypto API based password hashing (PBKDF2)
+const ITERATIONS = 100000;
+const KEY_LENGTH = 32;
+const SALT_LENGTH = 16;
+
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
+
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+
+  const derivedBits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt,
+      iterations: ITERATIONS,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    KEY_LENGTH * 8,
+  );
+
+  const hashArray = new Uint8Array(derivedBits);
+  const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, "0")).join("");
+  const hashHex = Array.from(hashArray).map(b => b.toString(16).padStart(2, "0")).join("");
+
+  return `pbkdf2:${ITERATIONS}:${saltHex}:${hashHex}`;
+}
+
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+
+  // Support legacy argon2 hashes (always fail for migration purposes)
+  if (storedHash.startsWith("$argon2")) {
+    return false;
+  }
+
+  // Parse PBKDF2 hash
+  const parts = storedHash.split(":");
+  if (parts.length !== 4 || parts[0] !== "pbkdf2") {
+    return false;
+  }
+
+  const [, iterationsStr, saltHex, hashHex] = parts;
+  const iterations = Number.parseInt(iterationsStr, 10);
+  const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map(byte => Number.parseInt(byte, 16)));
+  const expectedHash = new Uint8Array(hashHex.match(/.{2}/g)!.map(byte => Number.parseInt(byte, 16)));
+
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+
+  const derivedBits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt,
+      iterations,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    KEY_LENGTH * 8,
+  );
+
+  const derivedHash = new Uint8Array(derivedBits);
+
+  // Constant-time comparison
+  if (derivedHash.length !== expectedHash.length) {
+    return false;
+  }
+
+  let diff = 0;
+  for (let i = 0; i < derivedHash.length; i++) {
+    diff |= derivedHash[i] ^ expectedHash[i];
+  }
+
+  return diff === 0;
+}
 
 export class AuthService {
-  constructor(private db: DB) {}
+  constructor(private db: DB, private jwtSecret: string) {}
 
   async findUserByIdentifier(identifier: string) {
     const user = await this.db
@@ -22,11 +109,11 @@ export class AuthService {
   }
 
   async verifyPassword(password: string, hash: string) {
-    return await Bun.password.verify(password, hash);
+    return await verifyPassword(password, hash);
   }
 
   async hashPassword(password: string) {
-    return await Bun.password.hash(password);
+    return await hashPassword(password);
   }
 
   async generateToken(user: { id: number; role: string }) {
@@ -35,7 +122,7 @@ export class AuthService {
       role: user.role,
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
     };
-    return await sign(payload, env.JWT_SECRET);
+    return await sign(payload, this.jwtSecret);
   }
 
   async updatePassword(userId: number, newPasswordHash: string) {
@@ -47,3 +134,5 @@ export class AuthService {
     return result.length > 0;
   }
 }
+
+export { hashPassword, verifyPassword };

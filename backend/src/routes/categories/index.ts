@@ -1,11 +1,15 @@
+import type { Env } from "../../types";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { defaultHook } from "../../lib/route-factory";
-import { listCategoriesHandler } from "./handlers";
+import { createListCategoriesHandler } from "./handlers";
 import { listCategoriesRoute } from "./routes";
 
-const categoriesRouter = new OpenAPIHono({ defaultHook }).openapi(
-  listCategoriesRoute,
-  listCategoriesHandler,
-);
+export function createCategoriesRouter() {
+  const categoriesRouter = new OpenAPIHono<{ Bindings: Env }>({ defaultHook });
 
-export default categoriesRouter;
+  categoriesRouter.openapi(listCategoriesRoute, createListCategoriesHandler());
+
+  return categoriesRouter;
+}
+
+export default createCategoriesRouter;

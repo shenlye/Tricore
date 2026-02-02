@@ -1,18 +1,21 @@
-import type { RouteHandler } from "@hono/zod-openapi";
-import type { listCategoriesRoute } from "./routes";
-import { db } from "../../db";
+import type { Context } from "hono";
+import type { Env } from "../../types";
+import { createDb } from "../../db";
 import { CategoryService } from "../../services/categories";
 
-const categoryService = new CategoryService(db);
+export function createListCategoriesHandler() {
+  return async (c: Context<{ Bindings: Env }>) => {
+    const db = createDb(c.env.DB);
+    const categoryService = new CategoryService(db);
 
-export const listCategoriesHandler: RouteHandler<typeof listCategoriesRoute> = async (c) => {
-  const categories = await categoryService.listAll();
+    const categories = await categoryService.listAll();
 
-  return c.json(
-    {
-      success: true,
-      data: categories,
-    },
-    200,
-  );
-};
+    return c.json(
+      {
+        success: true,
+        data: categories,
+      },
+      200,
+    );
+  };
+}
