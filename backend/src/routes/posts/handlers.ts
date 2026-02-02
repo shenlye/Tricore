@@ -1,22 +1,11 @@
 import type { Context } from "hono";
 import type { Env } from "../../types";
 import { verify } from "hono/jwt";
-import { createDb } from "../../db";
-import { CategoryService } from "../../services/categories";
-import { PostService } from "../../services/posts";
-import { TagService } from "../../services/tags";
-
-function createServices(env: Env) {
-  const db = createDb(env.DB);
-  const categoryService = new CategoryService(db);
-  const tagService = new TagService(db);
-  const postService = new PostService(db, categoryService, tagService);
-  return { postService, jwtSecret: env.JWT_SECRET };
-}
 
 export function createGetPostHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const { postService, jwtSecret } = createServices(c.env);
+    const postService = c.get("postService");
+    const jwtSecret = c.env.JWT_SECRET;
     const slug = c.req.param("slug");
 
     const authHeader = c.req.header("Authorization");
@@ -59,7 +48,8 @@ export function createGetPostHandler() {
 
 export function createGetPostByIdHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const { postService, jwtSecret } = createServices(c.env);
+    const postService = c.get("postService");
+    const jwtSecret = c.env.JWT_SECRET;
     const id = Number(c.req.param("id"));
 
     const authHeader = c.req.header("Authorization");
@@ -102,7 +92,8 @@ export function createGetPostByIdHandler() {
 
 export function createListPostsHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const { postService, jwtSecret } = createServices(c.env);
+    const postService = c.get("postService");
+    const jwtSecret = c.env.JWT_SECRET;
 
     const url = new URL(c.req.url);
     const pageStr = url.searchParams.get("page") || "1";
@@ -148,7 +139,7 @@ export function createListPostsHandler() {
 
 export function createCreatePostHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const { postService } = createServices(c.env);
+    const postService = c.get("postService");
 
     const {
       title,
@@ -256,7 +247,7 @@ export function createCreatePostHandler() {
 
 export function createUpdatePostHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const { postService } = createServices(c.env);
+    const postService = c.get("postService");
     const id = Number(c.req.param("id"));
     const values = await c.req.json();
 
@@ -306,7 +297,7 @@ export function createUpdatePostHandler() {
 
 export function createDeletePostHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const { postService } = createServices(c.env);
+    const postService = c.get("postService");
     const id = Number(c.req.param("id"));
 
     const result = await postService.deletePost(id);

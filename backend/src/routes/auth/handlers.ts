@@ -1,12 +1,9 @@
 import type { Context } from "hono";
 import type { Env } from "../../types";
-import { createDb } from "../../db";
-import { AuthService } from "../../services/auth";
 
 export function createLoginHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const db = createDb(c.env.DB);
-    const authService = new AuthService(db, c.env.JWT_SECRET);
+    const authService = c.get("authService");
 
     const { identifier, password } = await c.req.json();
 
@@ -46,8 +43,7 @@ export function createLoginHandler() {
 
 export function createChangePasswordHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
-    const db = createDb(c.env.DB);
-    const authService = new AuthService(db, c.env.JWT_SECRET);
+    const authService = c.get("authService");
 
     const { oldPassword, newPassword } = await c.req.json();
     const payload = c.get("jwtPayload");

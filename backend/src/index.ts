@@ -7,6 +7,7 @@ import { createDb } from "./db";
 import { users } from "./db/schema";
 import { getAllowedOrigins } from "./lib/env";
 import { defaultHook } from "./lib/route-factory";
+import { servicesMiddleware } from "./middleware/services";
 import { createAuthRouter } from "./routes/auth/index";
 import { createCategoriesRouter } from "./routes/categories/index";
 import { createPostsRouter } from "./routes/posts/index";
@@ -16,6 +17,8 @@ import { hashPassword } from "./services/auth";
 const app = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook,
 });
+
+app.use("*", servicesMiddleware);
 
 app.use("*", async (c, next) => {
   const allowedOrigins = getAllowedOrigins(c.env);
