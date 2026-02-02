@@ -20,6 +20,15 @@
    # 将返回的 database_id 填入 wrangler.toml
    ```
 4. **设置密钥**:
+5. **部署**: `pnpm run deploy`
+
+6. **初始化管理员**:
+   本系统采用“首位注册提权”机制。部署完成后，直接访问前端或调用接口进行注册：
+   - **接口**: `POST /auth/register`
+   - **逻辑**: 系统检测到数据库为空时，首个注册的用户将自动获得 `admin` 权限。之后该接口将失效。
+
+### 前端 (Dashboard)
+...
    ```bash
    npx wrangler secret put JWT_SECRET
    ```

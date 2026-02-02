@@ -19,6 +19,22 @@ export const loginSchema = z.object({
   }),
 });
 
+export const registerSchema = z.object({
+  username: z.string().min(3, "用户名至少需要 3 个字符").openapi({
+    example: "admin",
+    description: "Username for the new user",
+  }),
+  email: z.string().email("无效的邮箱地址").openapi({
+    example: "admin@example.com",
+    description: "Email for the new user",
+  }),
+  password: strongPassword.openapi({
+    example: "admin123",
+    description: "Password for the new user",
+    format: "password",
+  }),
+});
+
 export const changePasswordSchema = z.object({
   oldPassword: z.string().min(6, "密码长度至少为 6 位").openapi({
     example: "oldPassword123",

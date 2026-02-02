@@ -1,5 +1,5 @@
 import type { DB } from "../db";
-import { eq, or } from "drizzle-orm";
+import { count, eq, or } from "drizzle-orm";
 import { sign } from "hono/jwt";
 import { users } from "../db/schema";
 
@@ -106,6 +106,16 @@ export class AuthService {
   async findUserById(id: number) {
     const user = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
     return user[0];
+  }
+
+  async countUsers() {
+    const result = await this.db.select({ count: count() }).from(users);
+    return result[0].count;
+  }
+
+  async createUser(data: typeof users.$inferInsert) {
+    const result = await this.db.insert(users).values(data).returning();
+    return result[0];
   }
 
   async verifyPassword(password: string, hash: string) {

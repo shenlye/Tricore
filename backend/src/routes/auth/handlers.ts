@@ -41,6 +41,48 @@ export function createLoginHandler() {
   };
 }
 
+export function createRegisterHandler() {
+  return async (c: Context<{ Bindings: Env }>) => {
+    const authService = c.get("authService");
+
+    const userCount = await authService.countUsers();
+
+    if (userCount > 0) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "FORBIDDEN",
+            message: "Registration is only allowed for the first user",
+          },
+        },
+        403,
+      );
+    }
+
+    const { username, email, password } = await c.req.json();
+
+    const hashedPassword = await authService.hashPassword(password);
+
+    await authService.createUser({
+      username,
+      email,
+      passwordHash: hashedPassword,
+      role: "admin", // The first user is always an admin
+    });
+
+    return c.json(
+      {
+        success: true,
+        data: {
+          message: "User registered successfully",
+        },
+      },
+      201,
+    );
+  };
+}
+
 export function createChangePasswordHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
     const authService = c.get("authService");
