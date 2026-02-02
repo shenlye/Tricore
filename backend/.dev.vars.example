@@ -1,16 +1,12 @@
 # Cloudflare Workers 环境变量配置
-# 这些变量需要在 Cloudflare Dashboard 中配置，或使用 wrangler secret put 命令
+# 这些变量属于敏感信息，不应提交到 Git。请复制此文件并重命名为 .dev.vars 后填入真实值。
 
 # JWT 密钥 (必需)
-JWT_SECRET=your_jwt_secret_key
+# 用于生成和验证身份令牌。请使用一个长随机字符串。
+JWT_SECRET=your_jwt_secret_key_here
 
-# 默认管理员密码 (可选，默认 admin123456)
-DEFAULT_ADMIN_PASSWORD=your_secure_admin_password
-
-# 允许的跨域来源 (在 wrangler.toml 中配置)
-ALLOWED_ORIGINS=https://your-domain.com,http://localhost:5173
-
-# Drizzle Studio 配置 (用于本地数据库管理)
+# pnpm run db:studio 管理线上 D1 数据库
 CLOUDFLARE_ACCOUNT_ID=your_account_id
 CLOUDFLARE_DATABASE_ID=your_database_id
 CLOUDFLARE_D1_TOKEN=your_d1_token
+

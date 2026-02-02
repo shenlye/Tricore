@@ -9,6 +9,7 @@ vars = { ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173" }
 binding = "DB"
 database_name = "my-api-db-dev"
 database_id = "23cae663-3c74-47a8-81f4-0daf09c5d4bc"
+migrations_dir = "drizzle"
 
 [env.production]
 vars = { ALLOWED_ORIGINS = "https://your-production-domain.com" }
@@ -16,3 +17,4 @@ vars = { ALLOWED_ORIGINS = "https://your-production-domain.com" }
 binding = "DB"
 database_name = "my-api-db"
 database_id = "937030fe-b3df-4aa7-b338-9ded33017ffa"
+migrations_dir = "drizzle"

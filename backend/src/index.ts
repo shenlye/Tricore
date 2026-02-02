@@ -5,7 +5,7 @@ import { count, eq } from "drizzle-orm";
 import { cors } from "hono/cors";
 import { createDb } from "./db";
 import { users } from "./db/schema";
-import { getAllowedOrigins } from "./lib/env";
+import { getAllowedOrigins, validateEnv } from "./lib/env";
 import { defaultHook } from "./lib/route-factory";
 import { servicesMiddleware } from "./middleware/services";
 import { createAuthRouter } from "./routes/auth/index";
@@ -21,7 +21,8 @@ const app = new OpenAPIHono<{ Bindings: Env }>({
 app.use("*", servicesMiddleware);
 
 app.use("*", async (c, next) => {
-  const allowedOrigins = getAllowedOrigins(c.env);
+  const env = validateEnv(c.env);
+  const allowedOrigins = getAllowedOrigins(env as any);
 
   const corsMiddleware = cors({
     origin: allowedOrigins,

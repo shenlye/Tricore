@@ -9,7 +9,6 @@ export interface Env {
 
   // Environment variables
   JWT_SECRET: string;
-  DEFAULT_ADMIN_PASSWORD: string;
   ALLOWED_ORIGINS: string;
 }
 

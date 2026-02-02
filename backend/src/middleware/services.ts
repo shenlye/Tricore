@@ -1,5 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { createDb } from "../db";
+import { validateEnv } from "../lib/env";
 import { AuthService } from "../services/auth";
 import { CategoryService } from "../services/categories";
 import { PostService } from "../services/posts";
@@ -15,11 +16,12 @@ let servicesCache: {
 
 export const servicesMiddleware = createMiddleware<{ Bindings: Env }>(async (c, next) => {
   if (!servicesCache) {
+    const validatedEnv = validateEnv(c.env);
     const db = createDb(c.env.DB);
     const categoryService = new CategoryService(db);
     const tagService = new TagService(db);
     const postService = new PostService(db, categoryService, tagService);
-    const authService = new AuthService(db, c.env.JWT_SECRET);
+    const authService = new AuthService(db, validatedEnv.JWT_SECRET);
 
     servicesCache = {
       categoryService,

@@ -3,9 +3,11 @@ import type { Env } from "../types";
 import { createMiddleware } from "hono/factory";
 import { jwt } from "hono/jwt";
 import { z } from "zod";
+import { validateEnv } from "../lib/env";
 
 export const authMiddleware = createMiddleware<{ Bindings: Env }>(async (c: Context, next: Next) => {
-  const jwtSecret = c.env.JWT_SECRET;
+  const env = validateEnv(c.env);
+  const jwtSecret = env.JWT_SECRET;
 
   const jwtMiddleware = jwt({
     secret: jwtSecret,

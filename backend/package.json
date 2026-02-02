@@ -6,13 +6,15 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev -e development",
+    "dev:remote": "wrangler dev -e development --remote",
     "deploy": "wrangler deploy",
     "lint": "eslint .",
     "format": "eslint . --fix",
     "generate": "drizzle-kit generate",
-    "migrate:local": "wrangler d1 migrations apply my-api-db --local",
-    "migrate:remote": "wrangler d1 migrations apply my-api-db --remote",
+    "migrate:local": "wrangler d1 migrations apply DB --local -e development",
+    "migrate:dev": "wrangler d1 migrations apply DB --remote -e development",
+    "migrate:remote": "wrangler d1 migrations apply DB --remote -e production",
     "db:studio": "drizzle-kit studio",
     "cf-typegen": "wrangler types"
   },
@@ -31,6 +33,6 @@
     "@types/node": "^25.0.3",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.18.0",
-    "wrangler": "^3.99.0"
+    "wrangler": "^4.61.1"
   }
 }
