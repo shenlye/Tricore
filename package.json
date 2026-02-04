@@ -16,6 +16,7 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@iconify/react": "^6.0.2",
+    "@my-api/backend": "github:shenlye/my-api#path:backend",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "gsap": "^3.14.2",
