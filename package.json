@@ -10,7 +10,8 @@
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "logs": "wrangler tail"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -18,6 +19,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "gsap": "^3.14.2",
+    "motion": "^12.31.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",

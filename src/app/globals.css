@@ -25,24 +25,30 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-  --background: oklch(0.12 0.01 255);
+  --background: oklch(0% 0 0);
   --foreground: oklch(0.98 0.005 255);
 
   --primary: oklch(0.8362 0.1033 146.93);
   --primary-foreground: oklch(0.1 0.02 146);
 
   --muted: oklch(0.18 0.02 255);
-  --muted-foreground: oklch(0.65 0.02 255);
+  --muted-foreground: oklch(82.656% 0.00009 271.152);
 
-  --accent: oklch(0.22 0.02 255);
+  --accent: oklch(23.36% 0.01723 259.779);
   --accent-foreground: oklch(0.95 0.01 255);
 
   --border: oklch(0.22 0.02 255);
   --ring: var(--primary);
+
+  --card: oklch(0.2382 0.0015 197.06);
+  --card-foreground: var(--foreground);
   }
 }
 

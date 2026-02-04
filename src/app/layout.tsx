@@ -3,6 +3,7 @@ import "./globals.css";
 import ThreeBackground from "@/components/ThreeBackground";
 import Sidebar from "@/components/Sidebar";
 import Dock from "@/components/Dock";
+import { MouseProvider } from "@/components/MouseContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,10 +20,12 @@ export default function RootLayout({
       <body
         className={`antialiased`}
       >
-        <ThreeBackground />
-        <Sidebar />
-        <Dock />
-        <main>{children}</main>
+        <MouseProvider >
+          <ThreeBackground />
+          <Sidebar />
+          <Dock />
+          <main className="perspective-[2500px]">{children}</main>
+        </MouseProvider>
       </body>
     </html>
   );

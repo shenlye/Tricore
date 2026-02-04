@@ -1,18 +1,21 @@
 'use client'
 
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei'
 import { Line } from '@react-three/drei'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import React from 'react'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
+import * as THREE from 'three'
+import { useMouse } from './MouseContext'
+import { MotionValue } from 'motion/react'
 
 function MeasurementGrid({
   size = 40,
-  divisions = 5,
+  divisions = 4,
   overflow = 0.5,
-  pinLength = 12,
-  gridHeight = 2
+  pinLength = 14,
+  gridHeight = 3
 }) {
   const lines = []
   const step = size / divisions
@@ -109,8 +112,49 @@ function Ground() {
   )
 }
 
+function Rig({ mouse }: { mouse?: { x: MotionValue<number>; y: MotionValue<number> } }) {
+  const yawRef = useRef<THREE.Group>(null!)
+  const pitchRef = useRef<THREE.Group>(null!)
+
+  const basePosition: [number, number, number] = [-3.04, -4.04, 17.78]
+  const baseYaw = -0.125
+  const basePitch = 0.20
+
+  useFrame((state) => {
+    // Use global mouse context if available (x/y are -0.5 to 0.5, so *2 to match -1 to 1)
+    const px = mouse ? mouse.x.get() * 2 : state.pointer.x
+    const py = mouse ? mouse.y.get() * 2 : state.pointer.y
+
+    const offsetY = -px * 0.1
+    const offsetX = -py * 0.1
+
+    yawRef.current.rotation.y = THREE.MathUtils.lerp(
+      yawRef.current.rotation.y,
+      baseYaw + offsetY,
+      0.1
+    )
+
+    pitchRef.current.rotation.x = THREE.MathUtils.lerp(
+      pitchRef.current.rotation.x,
+      basePitch + offsetX,
+      0.1
+    )
+  })
+
+  return (
+    <group ref={yawRef} position={basePosition}>
+      <group ref={pitchRef}>
+        <PerspectiveCamera makeDefault fov={70} />
+      </group>
+    </group>
+  )
+}
+
 export default function ThreeBackground() {
   const controlsRef = React.useRef<OrbitControlsImpl>(null);
+  const isAdjusting = false; 
+  const mouse = useMouse();
+
   return (
     <div 
       style={{ 
@@ -124,24 +168,25 @@ export default function ThreeBackground() {
       }}
     >
       <Canvas>
-        <PerspectiveCamera
-          makeDefault
-          position={[-10.19, -2.82, -5.57]}
-          rotation={[3.14, -1.12, 3.14]}
-          fov={70}
-        />
-        <OrbitControls
-          ref={controlsRef}
-          enableDamping={true} 
-          dampingFactor={0.05}
-          makeDefault
-        />
         <CameraLogger controlsRef={controlsRef} />
         <fog attach="fog" args={['#0a0a0a', 0, 100]} />
         <ambientLight intensity={0.8} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
-          <MeasurementGrid />
+        <MeasurementGrid />
         <Ground />
+        
+        {isAdjusting ? (
+          <>
+            <PerspectiveCamera
+              makeDefault
+              position={[0, 5, 20]}
+              fov={70}
+            />
+            <OrbitControls ref={controlsRef} makeDefault />
+          </>
+        ) : (
+          <Rig mouse={mouse} />
+        )}
       </Canvas>
     </div>
   )
