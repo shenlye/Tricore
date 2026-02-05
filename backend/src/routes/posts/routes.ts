@@ -6,10 +6,10 @@ import { createPostSchema, paginationSchema, PostSchema, updatePostSchema } from
 
 export const getPostRoute = createRoute({
   method: "get",
-  path: "/{slug}",
+  path: "/{idOrSlug}",
   request: {
     params: z.object({
-      slug: z.string().openapi({ example: "hello-world" }),
+      idOrSlug: z.string().openapi({ example: "hello-world" }),
     }),
   },
   responses: {
@@ -19,29 +19,7 @@ export const getPostRoute = createRoute({
           schema: createSuccessSchema(PostSchema),
         },
       },
-      description: "Retrieve the post",
-    },
-    404: createErrorResponse("Post not found"),
-    500: createErrorResponse("Internal server error"),
-  },
-});
-
-export const getPostByIdRoute = createRoute({
-  method: "get",
-  path: "/id/{id}",
-  request: {
-    params: z.object({
-      id: z.coerce.number().openapi({ example: 1 }),
-    }),
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: createSuccessSchema(PostSchema),
-        },
-      },
-      description: "Retrieve the post by ID",
+      description: "Retrieve the post by ID or Slug",
     },
     404: createErrorResponse("Post not found"),
     500: createErrorResponse("Internal server error"),

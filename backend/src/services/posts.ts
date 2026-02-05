@@ -12,27 +12,13 @@ export class PostService {
     private tagService: TagService,
   ) {}
 
-  async getPostBySlug(slug: string, onlyPublished = true) {
-    const conditions = [eq(posts.slug, slug), isNull(posts.deletedAt)];
-    if (onlyPublished) {
-      conditions.push(eq(posts.isPublished, true));
-    }
+  async getPostByIdentifier(identifier: string | number, onlyPublished = true) {
+    const isId = typeof identifier === "number" || /^\d+$/.test(String(identifier));
+    const conditions = [
+      isId ? eq(posts.id, Number(identifier)) : eq(posts.slug, String(identifier)),
+      isNull(posts.deletedAt),
+    ];
 
-    return await this.db.query.posts.findFirst({
-      where: and(...conditions),
-      with: {
-        category: true,
-        postsToTags: {
-          with: {
-            tag: true,
-          },
-        },
-      },
-    });
-  }
-
-  async getPostById(id: number, onlyPublished = true) {
-    const conditions = [eq(posts.id, id), isNull(posts.deletedAt)];
     if (onlyPublished) {
       conditions.push(eq(posts.isPublished, true));
     }

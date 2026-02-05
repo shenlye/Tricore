@@ -6,7 +6,7 @@ export function createGetPostHandler() {
   return async (c: Context<{ Bindings: Env }>) => {
     const postService = c.get("postService");
     const jwtSecret = c.env.JWT_SECRET;
-    const slug = c.req.param("slug");
+    const idOrSlug = c.req.param("idOrSlug");
 
     const authHeader = c.req.header("Authorization");
     let onlyPublished = true;
@@ -21,51 +21,7 @@ export function createGetPostHandler() {
       }
     }
 
-    const result = await postService.getPostBySlug(slug, onlyPublished);
-
-    if (!result) {
-      return c.json(
-        {
-          success: false,
-          error: {
-            code: "NOT_FOUND",
-            message: "Post not found",
-          },
-        },
-        404,
-      );
-    }
-
-    return c.json(
-      {
-        success: true,
-        data: postService.formatPost(result),
-      },
-      200,
-    );
-  };
-}
-
-export function createGetPostByIdHandler() {
-  return async (c: Context<{ Bindings: Env }>) => {
-    const postService = c.get("postService");
-    const jwtSecret = c.env.JWT_SECRET;
-    const id = Number(c.req.param("id"));
-
-    const authHeader = c.req.header("Authorization");
-    let onlyPublished = true;
-    if (authHeader?.startsWith("Bearer ")) {
-      const token = authHeader.substring(7);
-      try {
-        await verify(token, jwtSecret, "HS256");
-        onlyPublished = false;
-      }
-      catch {
-        // Invalid token, keep onlyPublished as true
-      }
-    }
-
-    const result = await postService.getPostById(id, onlyPublished);
+    const result = await postService.getPostByIdentifier(idOrSlug, onlyPublished);
 
     if (!result) {
       return c.json(

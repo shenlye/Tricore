@@ -4,7 +4,6 @@ import { defaultHook } from "../../lib/route-factory";
 import {
   createCreatePostHandler,
   createDeletePostHandler,
-  createGetPostByIdHandler,
   createGetPostHandler,
   createListPostsHandler,
   createUpdatePostHandler,
@@ -12,7 +11,6 @@ import {
 import {
   createPostRoute,
   deletePostRoute,
-  getPostByIdRoute,
   getPostRoute,
   listPostsRoute,
   updatePostRoute,
@@ -21,7 +19,6 @@ import {
 export function createPostsRouter() {
   return new OpenAPIHono<{ Bindings: Env }>({ defaultHook })
     .openapi(getPostRoute, createGetPostHandler())
-    .openapi(getPostByIdRoute, createGetPostByIdHandler())
     .openapi(listPostsRoute, createListPostsHandler())
     .openapi(createPostRoute, createCreatePostHandler())
     .openapi(updatePostRoute, createUpdatePostHandler())
