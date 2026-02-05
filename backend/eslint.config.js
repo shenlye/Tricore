@@ -8,4 +8,6 @@ export default antfu({
     quotes: "double",
     semi: true,
   },
+
+  ignores: ["worker-configuration.d.ts", "wrangler.toml"],
 });
