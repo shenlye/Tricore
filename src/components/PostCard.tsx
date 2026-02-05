@@ -4,6 +4,7 @@ import { useMouse } from "@/components/MouseContext";
 import { motion, useSpring, useTransform } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 
 interface PostCardProps {
     title: string;
@@ -16,12 +17,13 @@ interface PostCardProps {
 
 export default function PostCard({ title, description, category, date, slug, image = "/bg.jpg" }: PostCardProps) {
     const { x, y } = useMouse();
+    const [imgError, setImgError] = useState(false);
 
     const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [5, -5]), { stiffness: 150, damping: 20 });
     const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-5, 5]), { stiffness: 150, damping: 20 });
 
     return (
-        <Link href={`/blog/${slug}`} className="block w-full max-w-2xl" style={{ perspective: "2500px" }} >
+        <Link href={`/blog/${slug}`} className="block w-full max-w-2xl group" style={{ perspective: "2500px" }} >
             <motion.div style={{
                 rotateX,
                 rotateY,
@@ -63,20 +65,27 @@ export default function PostCard({ title, description, category, date, slug, ima
                     </div>
 
                     <div className="w-full md:w-auto md:h-25 h-auto aspect-21/9 overflow-hidden relative" style={{ transform: "translateZ(40px)" }}>
-                        <Image
-                            src={image}
-                            alt={title}
-                            fill
-                            className="object-cover object-center"
-                        />
+                        {image && !imgError ? (
+                            <Image
+                                src={image}
+                                alt={title}
+                                fill
+                                className="object-cover object-center"
+                                onError={() => setImgError(true)}
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center">
+                                <Icon icon="lucide:image-off" className="text-muted-foreground text-2xl" />
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div
-                    className="absolute bottom-0 left-0 w-full h-0.5 z-10 bg-[linear-gradient(to_right,#FF1AAC_23.33%,#01FFA2_23.33%_46.66%,#FFFA00_46.66%_70%,#D9D9D9_70%)]"
+                    className="absolute bottom-0 left-0 w-full h-0.5 z-10 opacity-30 group-hover:opacity-100 transition-opacity duration-300 bg-[linear-gradient(to_right,#FF1AAC_23.33%,#01FFA2_23.33%_46.66%,#FFFA00_46.66%_70%,#D9D9D9_70%)]"
                 ></div>
                 <div
-                    className="absolute -bottom-1 left-0 w-full h-0.5 blur-xs opacity-70 z-0 bg-[linear-gradient(to_right,#FF1AAC_23.33%,#01FFA2_23.33%_46.66%,#FFFA00_46.66%_70%,#D9D9D9_70%)]"
+                    className="absolute -bottom-1 left-0 w-full h-0.5 blur-xs opacity-0 group-hover:opacity-70 transition-opacity duration-300 z-0 bg-[linear-gradient(to_right,#FF1AAC_23.33%,#01FFA2_23.33%_46.66%,#FFFA00_46.66%_70%,#D9D9D9_70%)]"
                 ></div>
             </motion.div>
         </Link>

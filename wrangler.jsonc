@@ -4,6 +4,9 @@
 	"name": "my-lab",
 	"compatibility_date": "2026-01-31",
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"vars": {
+		"NEXT_PUBLIC_API_BASE_URL": "https://api.shenley.top"
+	},
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"
