@@ -1,0 +1,24 @@
+name = "my-api-backend"
+main = "src/index.ts"
+compatibility_date = "2026-01-31"
+compatibility_flags = [ "nodejs_compat" ]
+workers_dev = true
+preview_urls = true
+
+vars = { ALLOWED_ORIGINS = "https://admin.shenley.cn,https://shenley.cn" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-api-db"
+database_id = "afd970f6-6cba-491c-8f8f-6b4a8660f1b0"
+migrations_dir = "drizzle"
+
+[env.development]
+name = "my-api-backend-dev"
+vars = { ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173" }
+
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "my-api-db-dev"
+database_id = "9e3e885a-5440-499a-b547-abfd868511e4"
+migrations_dir = "drizzle"

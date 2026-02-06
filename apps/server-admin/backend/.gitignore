@@ -1,0 +1,25 @@
+# 数据库文件
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+
+.wrangler/
+.dev.vars
+
+# 环境配置文件
+.env
+.env.local
+.env.*.local
+
+# 依赖包
+node_modules/
+
+# Bun 运行时相关
+bun.lockb
+.DS_Store
+
+*.db
+sqlite*
+
+dist

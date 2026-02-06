@@ -1,0 +1,52 @@
+{
+  "name": "@my-api/backend",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev -e development",
+    "dev:remote": "wrangler dev -e development --remote",
+    "deploy": "wrangler deploy",
+    "lint": "eslint .",
+    "format": "eslint . --fix",
+    "generate": "drizzle-kit generate",
+    "migrate:local": "wrangler d1 migrations apply DB --local -e development",
+    "migrate:dev": "wrangler d1 migrations apply DB --remote -e development",
+    "migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "db:studio": "drizzle-kit studio",
+    "cf-typegen": "wrangler types",
+    "logs": "wrangler tail",
+    "logs:dev": "wrangler tail -e development",
+    "test": "vitest",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.2.1",
+    "@hono/zod-validator": "^0.7.6",
+    "@scalar/hono-api-reference": "^0.9.40",
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.11.7",
+    "pinyin-pro": "^3.28.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.12.9",
+    "@cloudflare/workers-types": "^4.20260205.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^25.2.0",
+    "drizzle-kit": "^0.31.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "typescript": "~5.9.3",
+    "vitest": "~3.2.0",
+    "wrangler": "^4.62.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue,jsx,tsx}": [
+      "eslint --fix"
+    ]
+  }
+}

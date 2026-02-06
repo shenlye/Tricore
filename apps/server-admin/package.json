@@ -1,0 +1,19 @@
+{
+  "name": "my-api-root",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint:frontend": "pnpm --filter admin-web run lint",
+    "lint:backend": "pnpm --filter @my-api/backend run lint",
+    "lint": "pnpm run lint:frontend && pnpm run lint:backend",
+    "format": "pnpm run format:frontend && pnpm run format:backend",
+    "format:frontend": "pnpm --filter admin-web run format",
+    "format:backend": "pnpm --filter @my-api/backend run format",
+    "deploy:backend": "pnpm --filter @my-api/backend run deploy",
+    "deploy:frontend": "pnpm --filter admin-web run build && pnpm --filter admin-web exec wrangler pages deploy frontend/dist --project-name=admin-web"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^7.0.1",
+    "eslint": "^9.18.0"
+  }
+}

@@ -1,0 +1,41 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - cloudflare-deploy
+    paths:
+      - 'frontend/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Frontend
+        run: pnpm --filter admin-web build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
+      - name: Deploy to Cloudflare Pages
+        run: pnpm dlx wrangler pages deploy frontend/dist --project-name=admin-web --branch=${{ github.ref_name }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
