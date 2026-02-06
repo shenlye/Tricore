@@ -10,10 +10,19 @@
     "format": "pnpm -r format",
     "deploy:frontend": "pnpm --filter @tricore/frontend deploy",
     "deploy:backend": "pnpm --filter @tricore/backend deploy",
-    "deploy:admin": "pnpm --filter @tricore/admin build && pnpm --filter @tricore/admin exec wrangler pages deploy dist --project-name=admin-web --branch=cloudflare-deploy"
+    "deploy:admin": "pnpm --filter @tricore/admin build && pnpm --filter @tricore/admin exec wrangler pages deploy dist --project-name=admin-web --branch=cloudflare-deploy",
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.2.0",
-    "eslint": "^9.18.0"
+    "eslint": "^9.18.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,vue,mjs,cjs}": [
+      "eslint --fix"
+    ]
   }
 }
