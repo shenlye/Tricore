@@ -1,6 +1,5 @@
-
-// This file provides type definitions for Cloudflare bindings that are 
-// referenced by imported library code (e.g. @my-api/backend) 
+// This file provides type definitions for Cloudflare bindings that are
+// referenced by imported library code (e.g. @my-api/backend)
 // but are not actually needed or present in this frontend worker.
 
 declare global {

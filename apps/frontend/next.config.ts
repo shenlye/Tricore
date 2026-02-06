@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
@@ -14,6 +16,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 initOpenNextCloudflareForDev();

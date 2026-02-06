@@ -16,9 +16,9 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@iconify/react": "^6.0.2",
-    "@tricore/backend": "workspace:*",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@tricore/backend": "workspace:*",
     "gsap": "^3.14.2",
     "hono": "^4.11.7",
     "motion": "^12.31.0",

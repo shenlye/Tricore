@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import "./globals.css";
-import ThreeBackground from "@/components/ThreeBackground";
-import Sidebar from "@/components/Sidebar";
 import Dock from "@/components/Dock";
 import { MouseProvider } from "@/components/MouseContext";
+import Sidebar from "@/components/Sidebar";
+import ThreeBackground from "@/components/ThreeBackground";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,9 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`antialiased`}
+        className="antialiased"
       >
-        <MouseProvider >
+        <MouseProvider>
           <ThreeBackground />
           <Sidebar />
           <Dock />

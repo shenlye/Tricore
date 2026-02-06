@@ -7,7 +7,7 @@ import { navItems } from "./navigation";
 
 export default function Dock() {
   const currentPath = usePathname();
-  const activeIndex = navItems.findIndex((item) => item.href === currentPath);
+  const activeIndex = navItems.findIndex(item => item.href === currentPath);
 
   return (
     <aside className="fixed left-5 top-1/2 z-50 hidden -translate-y-1/2 md:block">

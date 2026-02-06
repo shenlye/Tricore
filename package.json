@@ -21,8 +21,14 @@
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,vue,mjs,cjs}": [
-      "eslint --fix"
+    "apps/admin/**/*.{js,jsx,ts,tsx}": [
+      "pnpm --filter @tricore/admin lint --fix"
+    ],
+    "apps/backend/**/*.{js,ts}": [
+      "pnpm --filter @tricore/backend lint --fix"
+    ],
+    "apps/frontend/**/*.{js,jsx,ts,tsx,mjs,cjs}": [
+      "pnpm --filter @tricore/frontend lint --fix"
     ]
   }
 }

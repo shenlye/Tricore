@@ -8,7 +8,7 @@ import { navItems } from "./navigation";
 
 export default function Sidebar() {
   const currentPath = usePathname();
-  const activeIndex = navItems.findIndex((item) => item.href === currentPath);
+  const activeIndex = navItems.findIndex(item => item.href === currentPath);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
