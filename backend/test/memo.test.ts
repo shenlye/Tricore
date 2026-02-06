@@ -41,10 +41,9 @@ describe("memos CRUD tests", () => {
       throw new Error("Login failed");
     }
     adminToken = loginData.data.token;
-  });
 
-  it("pOST /api/v1/memos - should create a new memo", async () => {
-    const res = await app.request("/api/v1/memos", {
+    // Create a shared test memo that persists across all tests (beforeAll data survives isolated storage)
+    const createRes = await app.request("/api/v1/memos", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,13 +54,32 @@ describe("memos CRUD tests", () => {
         isPublished: true,
       }),
     }, env);
+    const createData = await createRes.json();
+    if (!createData.success) {
+      console.error("Memo creation failed:", JSON.stringify(createData, null, 2));
+      throw new Error("Memo creation failed");
+    }
+    testMemoId = createData.data.id;
+  });
+
+  it("pOST /api/v1/memos - should create a new memo", async () => {
+    const res = await app.request("/api/v1/memos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({
+        content: "Another test memo",
+        isPublished: true,
+      }),
+    }, env);
 
     expect(res.status).toBe(201);
     const data = await res.json();
     expect(data.success).toBe(true);
-    expect(data.data.content).toBe("This is a test memo");
+    expect(data.data.content).toBe("Another test memo");
     expect(data.data.isPublished).toBe(true);
-    testMemoId = data.data.id;
   });
 
   it("pOST /api/v1/memos - should return 401 without token", async () => {

@@ -44,10 +44,9 @@ describe("posts CRUD tests", () => {
       throw new Error("Login failed");
     }
     adminToken = loginData.data.token;
-  });
 
-  it("pOST /api/v1/posts - should create a new post", async () => {
-    const res = await app.request("/api/v1/posts", {
+    // Create a shared test post that persists across all tests (beforeAll data survives isolated storage)
+    const createRes = await app.request("/api/v1/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -63,13 +62,38 @@ describe("posts CRUD tests", () => {
         tags: ["test-tag-1", "test-tag-2"],
       }),
     }, env);
+    const createData = await createRes.json();
+    if (!createData.success) {
+      console.error("Post creation failed:", JSON.stringify(createData, null, 2));
+      throw new Error("Post creation failed");
+    }
+    testPostId = createData.data.id;
+  });
+
+  it("pOST /api/v1/posts - should create a new post", async () => {
+    const slug = `create-test-${crypto.randomUUID().slice(0, 8)}`;
+    const res = await app.request("/api/v1/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({
+        title: "Another Test Post",
+        slug,
+        content: "This is another test post content",
+        description: "Another test description",
+        isPublished: true,
+        category: "Test Category",
+        tags: ["test-tag-1"],
+      }),
+    }, env);
 
     expect(res.status).toBe(201);
     const data = await res.json();
     expect(data.success).toBe(true);
-    expect(data.data.title).toBe("Test Post");
-    expect(data.data.slug).toBe(testPostSlug);
-    testPostId = data.data.id;
+    expect(data.data.title).toBe("Another Test Post");
+    expect(data.data.slug).toBe(slug);
   });
 
   it("pOST /api/v1/posts - should return 401 without token", async () => {

@@ -1,13 +1,9 @@
-/* eslint-disable */
-// @ts-nocheck
-import type { D1Database, D1Migration } from "@cloudflare/workers-types";
+import type { D1Migration } from "@cloudflare/workers-types";
 
 declare global {
-  interface Body {
-      json(): Promise<any>;
-  }
   interface Response {
-      json(): Promise<any>;
+    // eslint-disable-next-line ts/method-signature-style
+    json(): Promise<any>;
   }
 }
 

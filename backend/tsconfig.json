@@ -6,9 +6,14 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["@cloudflare/workers-types", "node"],
+    "types": ["@cloudflare/workers-types", "node", "@cloudflare/vitest-pool-workers"],
     "strict": true,
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", "test"]
+  "include": [
+    "src/**/*", 
+    "test/**/*", 
+    "worker-configuration.d.ts"
+  ],
+  "exclude": ["node_modules"]
 }
