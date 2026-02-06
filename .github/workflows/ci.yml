@@ -22,10 +22,10 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run Lint
-        run: pnpm -r lint
+        run: pnpm -r --parallel lint
 
       - name: Run Tests
-        run: pnpm -r test
+        run: pnpm -r --stream test

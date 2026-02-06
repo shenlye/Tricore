@@ -9,12 +9,12 @@
     "test": "pnpm -r test",
     "format": "pnpm -r format",
     "deploy:frontend": "pnpm --filter @tricore/frontend deploy",
-    "deploy:admin:backend": "pnpm --filter @tricore/backend deploy",
-    "deploy:admin:frontend": "pnpm --filter @tricore/admin build && pnpm --filter @tricore/admin exec wrangler pages deploy dist --project-name=admin-web"
+    "deploy:backend": "pnpm --filter @tricore/backend deploy",
+    "deploy:admin": "pnpm --filter @tricore/admin build && pnpm --filter @tricore/admin exec wrangler pages deploy dist --project-name=admin-web"
   },
   "packageManager": "pnpm@10.12.1",
-    "devDependencies": {
-    "@antfu/eslint-config": "^7.0.1",
+  "devDependencies": {
+    "@antfu/eslint-config": "^7.2.0",
     "eslint": "^9.18.0"
   }
 }

@@ -1,9 +1,10 @@
 {
+  "prettier.enable": false,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always",
-    "source.organizeImports": "always"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
   },
   "eslint.validate": [
     "javascript",
@@ -29,10 +30,6 @@
     "postcss"
   ],
   "eslint.format.enable": true,
-  "eslint.workingDirectories": [
-    { "directory": "frontend", "changeProcessCWD": true },
-    { "directory": "backend", "changeProcessCWD": true }
-  ],
   "eslint.rules.customizations": [
     { "rule": "style/*", "severity": "off", "fixable": true },
     { "rule": "format/*", "severity": "off", "fixable": true },
@@ -45,7 +42,4 @@
     { "rule": "*quotes", "severity": "off", "fixable": true },
     { "rule": "*semi", "severity": "off", "fixable": true }
   ],
-  "[typescript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
 }

@@ -1,10 +1,11 @@
 packages:
-  - 'apps/backend'
-  - 'apps/admin'
-  - 'apps/frontend'
+  - apps/backend
+  - apps/admin
+  - apps/frontend
 
 onlyBuiltDependencies:
   - esbuild
   - msw
   - sharp
+  - unrs-resolver
   - workerd

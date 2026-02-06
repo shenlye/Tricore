@@ -1,4 +1,4 @@
-name: Deploy Admin Frontend
+name: Deploy Admin
 
 on:
   push:
@@ -13,22 +13,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: latest
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'pnpm'
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Build
         working-directory: apps/admin
         run: pnpm run build
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
       - name: Deploy to Cloudflare Pages
-        working-directory: apps/server-admin/frontend
+        working-directory: apps/admin
         run: pnpm dlx wrangler pages deploy dist --project-name=admin-web --branch=${{ github.ref_name }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
