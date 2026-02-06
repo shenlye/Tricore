@@ -12,7 +12,6 @@ export default async function BlogPage() {
     const res = await api.api.v1.posts.$get({
         query: {
             limit: "10",
-            type: "post",
         },
     });
 

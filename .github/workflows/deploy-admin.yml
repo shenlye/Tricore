@@ -16,8 +16,7 @@ jobs:
       
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: latest
+        
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -31,6 +30,6 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
       - name: Deploy to Cloudflare Pages
         working-directory: apps/admin
-        run: pnpm dlx wrangler pages deploy dist --project-name=admin-web --branch=${{ github.ref_name }}
+        run: pnpm dlx wrangler pages deploy dist --project-name=admin-web --branch=master
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
