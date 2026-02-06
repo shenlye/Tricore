@@ -16,11 +16,13 @@ export function createGetPostHandler(): RouteHandler<typeof routes.getPostRoute,
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.substring(7);
       try {
-        await verify(token, jwtSecret, "HS256");
-        onlyPublished = false;
+        const payload = await verify(token, jwtSecret, "HS256");
+        if (payload.role === "admin") {
+          onlyPublished = false;
+        }
       }
       catch {
-        // Invalid token, keep onlyPublished as true
+        // Invalid token or not an admin, keep onlyPublished as true
       }
     }
 
@@ -67,11 +69,13 @@ export function createListPostsHandler(): RouteHandler<typeof routes.listPostsRo
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.substring(7);
       try {
-        await verify(token, jwtSecret, "HS256");
-        onlyPublished = false;
+        const payload = await verify(token, jwtSecret, "HS256");
+        if (payload.role === "admin") {
+          onlyPublished = false;
+        }
       }
       catch {
-        // Invalid token, keep onlyPublished as true
+        // Invalid token or not an admin, keep onlyPublished as true
       }
     }
 
