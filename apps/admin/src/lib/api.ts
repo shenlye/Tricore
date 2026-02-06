@@ -1,4 +1,4 @@
-import type { AppType } from "@my-api/backend";
+import type { AppType } from "@tricore/backend";
 import { hc } from "hono/client";
 
 let baseUrl = import.meta.env.VITE_API_BASE_URL

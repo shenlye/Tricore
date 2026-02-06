@@ -1,13 +1,20 @@
 {
-  "name": "Tricore",
+  "name": "tricore-monorepo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "format": "pnpm -r format",
+    "deploy:frontend": "pnpm --filter @tricore/frontend deploy",
+    "deploy:admin:backend": "pnpm --filter @tricore/backend deploy",
+    "deploy:admin:frontend": "pnpm --filter @tricore/admin build && pnpm --filter @tricore/admin exec wrangler pages deploy dist --project-name=admin-web"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.12.1"
+  "packageManager": "pnpm@10.12.1",
+    "devDependencies": {
+    "@antfu/eslint-config": "^7.0.1",
+    "eslint": "^9.18.0"
+  }
 }

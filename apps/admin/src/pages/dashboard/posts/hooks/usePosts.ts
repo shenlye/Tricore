@@ -12,7 +12,6 @@ export function usePosts(page: number, limit: number, type?: "post" | "memo") {
         query: {
           page: page.toString(),
           limit: limit.toString(),
-          type,
         },
       }, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},

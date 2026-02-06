@@ -1,2 +1,10 @@
 packages:
-  - 'apps/*'
+  - 'apps/backend'
+  - 'apps/admin'
+  - 'apps/frontend'
+
+onlyBuiltDependencies:
+  - esbuild
+  - msw
+  - sharp
+  - workerd

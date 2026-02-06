@@ -1,5 +1,5 @@
 {
-  "name": "@my-api/backend",
+  "name": "@tricore/backend",
   "type": "module",
   "version": "1.0.0",
   "private": true,
@@ -19,8 +19,7 @@
     "cf-typegen": "wrangler types",
     "logs": "wrangler tail",
     "logs:dev": "wrangler tail -e development",
-    "test": "vitest",
-    "prepare": "husky"
+    "test": "vitest"
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.1",
@@ -33,20 +32,16 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^7.0.1",
     "@cloudflare/vitest-pool-workers": "^0.12.9",
     "@cloudflare/workers-types": "^4.20260205.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^25.2.0",
     "drizzle-kit": "^0.31.8",
-    "husky": "^9.1.7",
+    "eslint": "^9.18.0",
     "lint-staged": "^16.2.7",
     "typescript": "~5.9.3",
     "vitest": "~3.2.0",
     "wrangler": "^4.62.0"
-  },
-  "lint-staged": {
-    "*.{js,ts,vue,jsx,tsx}": [
-      "eslint --fix"
-    ]
   }
 }
