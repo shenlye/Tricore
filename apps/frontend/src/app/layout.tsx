@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Dock from "@/components/Dock";
 import { MouseProvider } from "@/components/MouseContext";
 import Sidebar from "@/components/Sidebar";
+import SmoothScroll from "@/components/SmoothScroll";
 import ThreeBackground from "@/components/ThreeBackground";
 import "./globals.css";
 
@@ -20,12 +21,14 @@ export default function RootLayout({
       <body
         className="antialiased"
       >
-        <MouseProvider>
-          <ThreeBackground />
-          <Sidebar />
-          <Dock />
-          <main className="perspective-[2500px]">{children}</main>
-        </MouseProvider>
+        <SmoothScroll>
+          <MouseProvider>
+            <ThreeBackground />
+            <Sidebar />
+            <Dock />
+            <main className="perspective-[2500px]">{children}</main>
+          </MouseProvider>
+        </SmoothScroll>
       </body>
     </html>
   );
