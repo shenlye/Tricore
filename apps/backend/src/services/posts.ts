@@ -250,12 +250,31 @@ export class PostService {
   }
 
   formatPost(post: any) {
+    // 如果没有description，从content中提取前100个字符
+    let description = post.description;
+    if (!description && post.content) {
+      // 移除markdown标记和多余空白
+      const plainText = post.content
+        .replace(/#{1,6}\s+/g, "") // 移除标题标记
+        .replace(/!\[.*?\]\(.*?\)/g, "") // 移除图片
+        .replace(/\[([^\]]+)\]\(.*?\)/g, "$1") // 移除链接，保留文本
+        .replace(/[*_~`]+/g, "") // 移除加粗、斜体、删除线、代码标记
+        .replace(/\n+/g, " ") // 将换行替换为空格
+        .replace(/\s+/g, " ") // 合并多个空格
+        .trim();
+
+      // 截取前100个字符
+      description = plainText.length > 100
+        ? `${plainText.substring(0, 100)}...`
+        : plainText;
+    }
+
     return {
       id: post.id,
       title: post.title,
       slug: post.slug,
       content: post.content,
-      description: post.description,
+      description,
       categories: post.category ? [post.category.name] : [],
       tags: post.postsToTags?.map((pt: any) => pt.tag.name) || [],
       cover: post.cover,

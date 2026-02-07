@@ -4,7 +4,9 @@
   "private": true,
   "packageManager": "pnpm@10.12.1",
   "scripts": {
-    "dev": "pnpm -r dev",
+    "dev:frontend": "pnpm --filter @tricore/frontend dev",
+    "dev:backend": "pnpm --filter @tricore/backend dev",
+    "dev:admin": "pnpm --filter @tricore/admin dev",
     "lint": "pnpm -r --parallel lint",
     "test": "pnpm -r --stream test",
     "format": "pnpm -r format",
