@@ -3,6 +3,8 @@ import { Icon } from "@iconify/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import PostWrapper, { PostItem } from "@/components/PostWrapper";
+import Twikoo from "@/components/Twikoo";
 import { api } from "@/lib/api";
 
 interface Props {
@@ -72,37 +74,50 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-background">
       <article className="container mx-auto px-4 py-16 max-w-3xl">
-        <Link href="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors">
-          <Icon icon="lucide:arrow-left" className="mr-2" />
-          Back to Blog
-        </Link>
+        <PostWrapper>
+          <PostItem>
+            <Link href="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors">
+              <Icon icon="lucide:arrow-left" className="mr-2" />
+              Back to Blog
+            </Link>
+          </PostItem>
 
-        <header className="mb-12">
+          <header className="mb-12">
+            <PostItem>
+              <h1 className="text-4xl font-bold mb-6 tracking-tight text-balance">
+                {displayTitle}
+              </h1>
+            </PostItem>
 
-          <h1 className="text-4xl font-bold mb-6 tracking-tight text-balance">
-            {displayTitle}
-          </h1>
+            <PostItem>
+              <div className="flex items-center text-muted-foreground text-sm">
+                <time dateTime={post.createdAt}>
+                  {new Date(post.createdAt).toLocaleDateString("zh-CN", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              </div>
+            </PostItem>
+          </header>
 
-          <div className="flex items-center text-muted-foreground text-sm">
-            <time dateTime={post.createdAt}>
-              {new Date(post.createdAt).toLocaleDateString("zh-CN", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
-          </div>
-        </header>
+          <PostItem>
+            <div className="prose dark:prose-invert max-w-none prose-md">
+              {post.content
+                ? (
+                    <ReactMarkdown>{post.content}</ReactMarkdown>
+                  )
+                : (
+                    <p className="text-muted-foreground">No content available.</p>
+                  )}
+            </div>
+          </PostItem>
 
-        <div className="prose dark:prose-invert max-w-none prose-md">
-          {post.content
-            ? (
-                <ReactMarkdown>{post.content}</ReactMarkdown>
-              )
-            : (
-                <p className="text-muted-foreground">No content available.</p>
-              )}
-        </div>
+          <PostItem>
+            <Twikoo envId="https://twikoo.shenley.top" />
+          </PostItem>
+        </PostWrapper>
       </article>
     </div>
   );
