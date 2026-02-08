@@ -58,7 +58,7 @@ export class LinkService {
       })
       .returning();
 
-    return result[0];
+    return result[0] ?? null;
   }
 
   async updateLink(
@@ -89,12 +89,12 @@ export class LinkService {
       .where(eq(links.id, id))
       .returning();
 
-    return result[0];
+    return result[0] ?? null;
   }
 
   async deleteLink(id: number) {
     const result = await this.db.delete(links).where(eq(links.id, id)).returning();
 
-    return result[0];
+    return result[0] ?? null;
   }
 }
