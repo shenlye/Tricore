@@ -78,17 +78,8 @@ export default async function BlogPostPage({ params }: Props) {
         </Link>
 
         <header className="mb-12">
-          {post.categories && post.categories.length > 0 && (
-            <div className="flex gap-2 mb-4">
-              {post.categories.map((cat: string) => (
-                <span key={cat} className="text-xs font-medium px-2 py-1 bg-secondary text-secondary-foreground rounded-xs">
-                  {cat}
-                </span>
-              ))}
-            </div>
-          )}
 
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-balance">
+          <h1 className="text-4xl font-bold mb-6 tracking-tight text-balance">
             {displayTitle}
           </h1>
 
@@ -103,7 +94,7 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </header>
 
-        <div className="prose dark:prose-invert max-w-none prose-lg">
+        <div className="prose dark:prose-invert max-w-none prose-md">
           {post.content
             ? (
                 <ReactMarkdown>{post.content}</ReactMarkdown>

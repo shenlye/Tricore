@@ -1,91 +1,86 @@
 "use client";
 
-import { Icon } from "@iconify/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useNav } from "@/hooks/use-nav";
 import { navItems } from "./navigation";
 
 export default function Sidebar() {
   const currentPath = usePathname();
   const activeIndex = navItems.findIndex(item => item.href === currentPath);
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, close } = useNav();
 
   return (
-    <div className="md:hidden">
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg cursor-pointer hover:shadow-xl"
-        aria-label="打开菜单"
-      >
-        <Icon icon="material-symbols-light:menu" className="h-6 w-6 text-foreground" />
-      </button>
-
+    <>
+      {/* Mobile backdrop */}
       <div
-        className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-30 bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
-        onClick={() => setIsOpen(false)}
+        onClick={close}
       />
 
+      {/* Sidebar panel */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-full w-50 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed top-12 bottom-0 left-0 z-40 w-50 border-r border-border bg-transparent transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-lg ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <nav className="h-full overflow-hidden bg-background shadow-[10px_0_30px_rgba(0,0,0,0.2)]">
-          <div className="flex h-14 items-center justify-between px-4">
-            <span className="text-sm font-medium text-foreground">菜单</span>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-accent"
-              aria-label="关闭菜单"
-            >
-              <Icon icon="material-symbols-light:close" className="h-5 w-5 text-foreground" />
-            </button>
+        <nav className="flex h-full flex-col overflow-y-auto">
+          {/* Section label */}
+          <div className="border-b border-border px-4 py-3">
+            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Navigation
+            </span>
           </div>
 
-          <ul className="relative flex flex-col gap-2 p-2">
+          {/* Nav items — sharp edges, monospace, no rounded corners */}
+          <ul className="relative flex flex-col gap-px ">
+            {/* Sliding highlight */}
             <li
-              className="pointer-events-none absolute left-2 right-2 h-10 rounded-2xl bg-primary transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="pointer-events-none absolute left-3 right-3 h-10 bg-foreground transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{
-                transform: `translateY(${activeIndex * 48}px)`,
+                transform: `translateY(${activeIndex * 41}px)`,
                 opacity: activeIndex >= 0 ? 1 : 0,
               }}
             />
-            {navItems.map((item) => {
+            {navItems.map((item, i) => {
               const isActive = currentPath === item.href;
               return (
                 <li key={item.href} className="relative z-10">
                   <Link
                     href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex h-10 items-center rounded-2xl transition-colors duration-200 ${
+                    onClick={() => {
+                      if (typeof window !== "undefined" && window.innerWidth < 768)
+                        close();
+                    }}
+                    className={`group flex h-10 items-center gap-3 px-2 font-mono text-xs uppercase tracking-[0.15em] transition-colors duration-200 ${
                       isActive
-                        ? "text-primary-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        ? "bg-foreground text-background"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center">
-                      <Icon
-                        icon={item.icon}
-                        className={`h-5.5 w-5.5 ${isActive ? "text-primary-foreground" : "text-muted-foreground"}`}
-                      />
-                    </div>
-                    <span
-                      className={`ml-3 whitespace-nowrap text-sm ${
-                        isActive ? "text-primary-foreground" : "text-foreground"
-                      }`}
-                    >
-                      {item.label}
+                    {/* Index number */}
+                    <span className={`w-4 text-[10px] tabular-nums ${isActive ? "text-background" : "text-muted-foreground/50"}`}>
+                      {String(i + 1).padStart(2, "0")}
                     </span>
+                    <span>{item.label}</span>
                   </Link>
                 </li>
               );
             })}
           </ul>
+
+          {/* Bottom section — Swiss-style footer mark */}
+          <div className="mt-auto border-t border-border px-5 py-4">
+            <p className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.3em] text-muted-foreground/40">
+              Shenley
+              <br />
+              © 2026
+            </p>
+          </div>
         </nav>
       </aside>
-    </div>
+    </>
   );
 }

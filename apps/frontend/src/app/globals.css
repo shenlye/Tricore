@@ -21,6 +21,18 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
+.scroll-box {
+    scrollbar-color: var(--color-primary);
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--color-primary);
+        border-radius: 20px;
+    }
+}
+
 :root {
   --background: #ffffff;
   --foreground: oklch(0.145 0.02 255);
@@ -49,6 +61,9 @@ html.lenis, html.lenis body {
   --color-border: var(--border);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+
+  --font-mono: var(--font-jetbrains), var(--font-noto-sans-sc), ui-mono, monospace;
+  --font-sans: var(--font-inter), var(--font-noto-sans-sc), ui-sans-serif, system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -76,5 +91,7 @@ html.lenis, html.lenis body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-family: var(--font-sans), var(--font-noto-sans-sc), ui-sans-serif, system-ui, sans-serif;
 }
+
+

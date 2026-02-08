@@ -4,6 +4,7 @@ import type { MotionValue } from "motion/react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { Line, OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { usePathname } from "next/navigation";
 import * as React from "react";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
@@ -155,6 +156,11 @@ export default function ThreeBackground() {
   const controlsRef = React.useRef<OrbitControlsImpl>(null);
   const isAdjusting = false;
   const mouse = useMouse();
+  const pathname = usePathname();
+
+  // Hide on homepage — the homepage uses its own opaque background
+  if (pathname === "/")
+    return null;
 
   return (
     <div
