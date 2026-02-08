@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { BlogHeader } from "@/components/BlogHeader";
+import BlogList from "@/components/BlogList";
 import { api } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Blog | My Lab",
   description: "Read my latest thoughts and articles on technology, design, and more.",
 };
-
-function formatDate(date: string | null | undefined) {
-  if (!date)
-    return "";
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-}
 
 export default async function BlogPage() {
   let postsRes;
@@ -35,32 +27,12 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center px-6 py-24 max-w-2xl mx-auto">
-      <header className="w-full mb-16">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Save Point
-        </h1>
-        <p className="mt-4 text-muted-foreground text-md">
-          Ideas worth remembering, one post at a time.
-        </p>
-      </header>
+      <BlogHeader
+        title="Save Point"
+        description="Ideas worth remembering, one post at a time."
+      />
 
-      <ul className="w-full flex flex-col">
-        {posts.map(post => (
-          <li key={post.id}>
-            <Link
-              href={`/blog/${post.slug}`}
-              className="group flex items-baseline gap-4 py-4 "
-            >
-              <span className="text-base md:text-lg font-medium group-hover:text-primary transition-colors truncate">
-                {post.title || "Untitled"}
-              </span>
-              <time className="text-sm text-muted-foreground shrink-0 tabular-nums">
-                {formatDate(post.createdAt)}
-              </time>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <BlogList posts={posts} />
 
       {posts.length === 0 && (
         <p className="text-muted-foreground mt-8">No posts yet.</p>

@@ -22,13 +22,13 @@ html.lenis, html.lenis body {
 }
 
 .scroll-box {
-    scrollbar-color: var(--color-primary);
+    scrollbar-color: var(--color-foreground);
     &::-webkit-scrollbar {
         width: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: var(--color-primary);
+        background-color: var(--color-foreground);
         border-radius: 20px;
     }
 }
@@ -68,7 +68,7 @@ html.lenis, html.lenis body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-  --background: oklch(0% 0 0);
+  --background: oklch(0.1408 0.0044 285.82);
   --foreground: oklch(0.98 0.005 255);
 
   --primary: oklch(0.8362 0.1033 146.93);
@@ -80,10 +80,10 @@ html.lenis, html.lenis body {
   --accent: oklch(23.36% 0.01723 259.779);
   --accent-foreground: oklch(0.95 0.01 255);
 
-  --border: oklch(0.22 0.02 255);
+  --border: oklch(0.3 0.02 255);
   --ring: var(--primary);
 
-  --card: oklch(0.2382 0.0015 197.06);
+  --card: oklch(0.2103 0.0059 285.89);
   --card-foreground: var(--foreground);
   }
 }

@@ -21,7 +21,7 @@ export function MainContent({ children }: { children: React.ReactNode }) {
 
   return (
     <main
-      className={`transition-[margin] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] perspective-[2500px] ${
+      className={`transition-[margin] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] min-h-screen ${
         isOpen ? "md:ml-50" : "md:ml-0"
       }`}
     >
