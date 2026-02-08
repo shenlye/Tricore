@@ -4,6 +4,7 @@ import { createDb } from "../db";
 import { validateEnv } from "../lib/env";
 import { AuthService } from "../services/auth";
 import { CategoryService } from "../services/categories";
+import { LinkService } from "../services/links";
 import { MemoService } from "../services/memos";
 import { PostService } from "../services/posts";
 import { TagService } from "../services/tags";
@@ -13,6 +14,7 @@ let servicesCache: {
   memoService: MemoService;
   categoryService: CategoryService;
   tagService: TagService;
+  linkService: LinkService;
   authService: AuthService;
 } | null = null;
 
@@ -24,6 +26,7 @@ export const servicesMiddleware = createMiddleware<{ Bindings: Env }>(async (c, 
     const tagService = new TagService(db);
     const postService = new PostService(db, categoryService, tagService);
     const memoService = new MemoService(db);
+    const linkService = new LinkService(db);
     const authService = new AuthService(db, validatedEnv.JWT_SECRET);
 
     servicesCache = {
@@ -31,6 +34,7 @@ export const servicesMiddleware = createMiddleware<{ Bindings: Env }>(async (c, 
       tagService,
       postService,
       memoService,
+      linkService,
       authService,
     };
   }
@@ -39,6 +43,7 @@ export const servicesMiddleware = createMiddleware<{ Bindings: Env }>(async (c, 
   c.set("memoService", servicesCache.memoService);
   c.set("categoryService", servicesCache.categoryService);
   c.set("tagService", servicesCache.tagService);
+  c.set("linkService", servicesCache.linkService);
   c.set("authService", servicesCache.authService);
 
   await next();

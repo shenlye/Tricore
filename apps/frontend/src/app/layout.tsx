@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansSC.variable}`}>
       <body
-        className="antialiased scroll-box"
+        className="antialiased scroll-box [text-autospace:normal]"
       >
         <SmoothScroll>
           <MouseProvider>

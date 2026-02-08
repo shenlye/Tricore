@@ -21,16 +21,5 @@
     "eslint": "^9.18.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7"
-  },
-  "lint-staged": {
-    "apps/admin/**/*.{js,jsx,ts,tsx}": [
-      "pnpm --filter @tricore/admin lint --fix"
-    ],
-    "apps/backend/**/*.{js,ts}": [
-      "pnpm --filter @tricore/backend lint --fix"
-    ],
-    "apps/frontend/**/*.{js,jsx,ts,tsx,mjs,cjs}": [
-      "pnpm --filter @tricore/frontend lint --fix"
-    ]
   }
 }

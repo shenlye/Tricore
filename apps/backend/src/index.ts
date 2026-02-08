@@ -7,6 +7,7 @@ import { defaultHook } from "./lib/route-factory";
 import { servicesMiddleware } from "./middleware/services";
 import { createAuthRouter } from "./routes/auth/index";
 import { createCategoriesRouter } from "./routes/categories/index";
+import { createLinksRouter } from "./routes/links/index";
 import { createMemosRouter } from "./routes/memos/index";
 import { createPostsRouter } from "./routes/posts/index";
 import { createTagsRouter } from "./routes/tags/index";
@@ -37,7 +38,8 @@ const routes = app
   .route("/api/v1/memos", createMemosRouter())
   .route("/api/v1/auth", createAuthRouter())
   .route("/api/v1/categories", createCategoriesRouter())
-  .route("/api/v1/tags", createTagsRouter());
+  .route("/api/v1/tags", createTagsRouter())
+  .route("/api/v1/links", createLinksRouter());
 
 app.onError((err, c) => {
   console.error(err);
