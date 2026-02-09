@@ -38,7 +38,7 @@ export default function Sidebar() {
           <ul className="relative flex flex-col gap-px ">
             {/* Sliding highlight */}
             <li
-              className="pointer-events-none absolute left-0 right-0 h-10 bg-foreground transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="pointer-events-none absolute left-0 right-0 h-10 bg-primary transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{
                 transform: `translateY(${activeIndex * 41}px)`,
                 opacity: activeIndex >= 0 ? 1 : 0,
@@ -56,7 +56,7 @@ export default function Sidebar() {
                     }}
                     className={`group flex h-10 items-center gap-3 px-2 font-mono text-xs uppercase tracking-[0.15em] transition-colors duration-200 ${
                       isActive
-                        ? "bg-foreground text-background"
+                        ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
 import { Inter, JetBrains_Mono, Noto_Sans_SC } from "next/font/google";
 import Script from "next/script";
 import { MouseProvider } from "@/components/MouseContext";
@@ -39,22 +40,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansSC.variable}`}>
-      <body
-        className="antialiased scroll-box [text-autospace:normal]"
-      >
-        <Script
-          src="https://umami.shenley.top/script.js"
-          data-website-id="233e3c19-775e-4a96-b5be-84a2222abfaf"
-        />
-        <SmoothScroll>
-          <MouseProvider>
-            <NavProvider>
-              <TopBar />
-              <Sidebar />
-              <MainContent>{children}</MainContent>
-            </NavProvider>
-          </MouseProvider>
-        </SmoothScroll>
+      <body className="antialiased scroll-box [text-autospace:normal]">
+        <ThemeProvider defaultTheme="dark">
+          <Script
+            src="https://umami.shenley.top/script.js"
+            data-website-id="233e3c19-775e-4a96-b5be-84a2222abfaf"
+          />
+          <SmoothScroll>
+            <MouseProvider>
+              <NavProvider>
+                <TopBar />
+                <Sidebar />
+                <MainContent>{children}</MainContent>
+              </NavProvider>
+            </MouseProvider>
+          </SmoothScroll>
+        </ThemeProvider>
       </body>
     </html>
   );
