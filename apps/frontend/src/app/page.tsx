@@ -38,7 +38,7 @@ export default function Home() {
           <motion.div variants={item} className="text-[10px] font-mono">01.HOME</motion.div>
           <motion.div variants={item} className="md:text-8xl text-7xl -ml-2 overflow-hidden">SHENLEY</motion.div>
           <motion.div variants={item} className="text-sm font-mono">[ Frontend Developer ]</motion.div>
-          <motion.div variants={item} className="text-md border-l-3 border-primary pl-3 py-1">"慢慢来, 比较快"</motion.div>
+          <motion.div variants={item} className="text-md border-l-3 border-primary pl-3 py-1">"慢慢来，比较快，我并没有座右铭，这里其实是可以随便改的"</motion.div>
         </motion.div>
         <div className="flex-1 h-full min-h-100">
         </div>

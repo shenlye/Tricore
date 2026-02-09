@@ -29,7 +29,7 @@ export default function Sidebar() {
         <nav className="flex h-full flex-col overflow-y-auto">
           {/* Section label */}
           <div className="border-b border-border px-4 py-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+            <span className="font-mono text-[10px] uppercase text-muted-foreground">
               Navigation
             </span>
           </div>
