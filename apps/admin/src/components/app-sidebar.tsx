@@ -1,4 +1,4 @@
-import { FileText, LayoutDashboard, Users } from "lucide-react";
+import { FileText, LayoutDashboard, Link2, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -13,6 +13,7 @@ import {
 const items = [
   { title: "概览", url: "/dashboard", icon: LayoutDashboard },
   { title: "文章管理", url: "/dashboard/posts", icon: FileText },
+  { title: "友链管理", url: "/dashboard/links", icon: Link2 },
   { title: "用户管理", url: "/dashboard/users", icon: Users },
 ];
 

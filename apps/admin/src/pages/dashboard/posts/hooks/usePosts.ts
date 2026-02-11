@@ -3,9 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { client } from "@/lib/api";
 
-export function usePosts(page: number, limit: number, type?: "post" | "memo") {
+export function usePosts(page: number, limit: number) {
   return useQuery({
-    queryKey: ["posts", page, limit, type],
+    queryKey: ["posts", page, limit],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const res = await client.api.v1.posts.$get({

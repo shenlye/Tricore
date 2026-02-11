@@ -12,13 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -39,7 +32,6 @@ export function CreatePostDialog({
     title: "",
     slug: "",
     description: "",
-    type: "post",
     content: "",
     isPublished: false,
   });
@@ -55,28 +47,11 @@ export function CreatePostDialog({
         <DialogHeader>
           <DialogTitle>新建文章</DialogTitle>
           <DialogDescription>
-            创建一个新的文章或便签。创建后可以继续编辑正文内容。
+            创建一个新的文章。创建后可以继续编辑正文内容。
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="type">类型</Label>
-            <Select
-              value={formData.type}
-              onValueChange={(value: "post" | "memo") =>
-                setFormData({ ...formData, type: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="选择类型" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="post">文章 (Post)</SelectItem>
-                <SelectItem value="memo">便签 (Memo)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="title">标题</Label>
             <Input
@@ -84,22 +59,20 @@ export function CreatePostDialog({
               placeholder="文章标题"
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
-              required={formData.type === "post"}
+              required
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="slug">
               Slug (链接标识)
-              {formData.type === "post" && (
-                <span className="text-xs text-muted-foreground ml-2">
-                  (留空将根据标题自动生成)
-                </span>
-              )}
+              <span className="text-xs text-muted-foreground ml-2">
+                (留空将根据标题自动生成)
+              </span>
             </Label>
             <Input
               id="slug"
-              placeholder="my-new-post"
+              placeholder="example-post-title"
               value={formData.slug}
               onChange={e => setFormData({ ...formData, slug: e.target.value })}
             />

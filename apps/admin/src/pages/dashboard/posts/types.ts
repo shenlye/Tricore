@@ -1,36 +1,15 @@
+import type { InferRequestType, InferResponseType } from "hono/client";
+import type { client } from "@/lib/api";
+
+export type PostResponse = InferResponseType<typeof client.api.v1.posts.$get>;
+export type Post = Extract<PostResponse, { data: any }>["data"][number];
+
+export type CreatePostData = InferRequestType<typeof client.api.v1.posts.$post>["json"];
+export type UpdatePostData = InferRequestType<typeof client.api.v1.posts[":id"]["$patch"]>["json"];
+
 export interface PostFormData {
   title: string;
   slug: string;
   description: string;
   isPublished: boolean;
-  type?: "post" | "memo";
-}
-
-export interface CreatePostData extends PostFormData {
-  type: "post" | "memo";
-  content: string;
-}
-
-export interface UpdatePostData {
-  title?: string;
-  slug?: string;
-  description?: string;
-  content?: string;
-  isPublished?: boolean;
-  type?: "post" | "memo";
-  cover?: string;
-  category?: string;
-  tags?: string[];
-}
-
-export interface Post {
-  id: number;
-  title: string | null;
-  slug: string | null;
-  description: string | null;
-  content: string | null;
-  type: string;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
 }

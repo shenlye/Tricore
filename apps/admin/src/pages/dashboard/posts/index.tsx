@@ -62,7 +62,6 @@ export default function PostsPage() {
           slug: values.slug || undefined,
           description: values.description || undefined,
           isPublished: values.isPublished,
-          type: values.type,
         },
       }, {
         onSuccess: () => {

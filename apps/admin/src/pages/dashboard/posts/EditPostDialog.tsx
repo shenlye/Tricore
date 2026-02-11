@@ -12,13 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 interface EditPostDialogProps {
@@ -84,7 +77,6 @@ function EditPostForm({ post, onSave, onEditContent, isSaving, onClose }: EditPo
     slug: post.slug || "",
     description: post.description || "",
     isPublished: post.isPublished || false,
-    type: (post.type as "post" | "memo") || "post",
   });
 
   const handleSubmit = () => {
@@ -95,43 +87,24 @@ function EditPostForm({ post, onSave, onEditContent, isSaving, onClose }: EditPo
     <>
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="type">类型</Label>
-          <Select
-            value={formData.type}
-            onValueChange={(value: "post" | "memo") =>
-              setFormData({ ...formData, type: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="选择类型" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="post">文章 (Post)</SelectItem>
-              <SelectItem value="memo">便签 (Memo)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="title">标题</Label>
           <Input
             id="title"
+            placeholder="文章标题"
             value={formData.title}
             onChange={e => setFormData({ ...formData, title: e.target.value })}
-            placeholder="文章标题"
+            required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="slug">Slug</Label>
+          <Label htmlFor="slug">Slug (链接标识)</Label>
           <Input
             id="slug"
+            placeholder="example-post-title"
             value={formData.slug}
             onChange={e => setFormData({ ...formData, slug: e.target.value })}
-            placeholder="url-friendly-slug"
           />
-          <p className="text-xs text-muted-foreground">
-            用于 URL 的唯一标识，只能包含小写字母、数字和连字符
-          </p>
         </div>
 
         <div className="space-y-2">

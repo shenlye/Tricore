@@ -55,7 +55,6 @@ export function PostsTable({
           <TableRow>
             <TableHead className="w-20">ID</TableHead>
             <TableHead>标题</TableHead>
-            <TableHead>类型</TableHead>
             <TableHead>状态</TableHead>
             <TableHead>发布时间</TableHead>
             <TableHead className="text-right">操作</TableHead>
@@ -67,7 +66,7 @@ export function PostsTable({
                 Array.from({ length: skeletonCount }).map((_, i) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <TableRow key={`skeleton-${i}`}>
-                    <TableCell colSpan={6} className="h-12">
+                    <TableCell colSpan={5} className="h-12">
                       <Skeleton className="h-4 w-full" />
                     </TableCell>
                   </TableRow>
@@ -76,7 +75,7 @@ export function PostsTable({
             : posts?.length === 0
               ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                       暂无文章
                     </TableCell>
                   </TableRow>
@@ -96,18 +95,11 @@ export function PostsTable({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary">
-                          {post.type === "memo" ? "便签" : "文章"}
+                        <Badge
+                          variant={post.isPublished ? "default" : "secondary"}
+                        >
+                          {post.isPublished ? "已发布" : "草稿"}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {post.isPublished
-                          ? (
-                              <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none shadow-none">已发布</Badge>
-                            )
-                          : (
-                              <Badge variant="outline" className="text-amber-600 border-amber-200">草稿</Badge>
-                            )}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {new Date(post.createdAt).toLocaleDateString()}
