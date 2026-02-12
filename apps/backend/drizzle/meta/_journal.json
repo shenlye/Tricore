@@ -22,13 +22,6 @@
       "when": 1770550814629,
       "tag": "0002_peaceful_dexter_bennett",
       "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1770907650652,
-      "tag": "0003_deep_firelord",
-      "breakpoints": true
     }
   ]
 }
