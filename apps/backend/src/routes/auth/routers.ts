@@ -4,6 +4,8 @@ import { createSuccessSchema } from "../../lib/schema";
 import { authMiddleware } from "../../middleware/auth";
 import { changePasswordSchema, loginSchema, registerSchema } from "./schema";
 
+export { meRoute } from "./me";
+
 export const loginRoute = createRoute({
   method: "post",
   path: "/login",

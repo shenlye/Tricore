@@ -193,3 +193,51 @@ export function createChangePasswordHandler(): RouteHandler<typeof routes.change
     );
   };
 }
+
+export function createMeHandler(): RouteHandler<typeof routes.meRoute, { Bindings: Env }> {
+  return async (c) => {
+    const authService = c.get("authService");
+    const payload = c.get("jwtPayload");
+
+    const userId = payload?.sub;
+    if (!userId) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "UNAUTHORIZED",
+            message: "Unauthorized",
+          },
+        },
+        401,
+      );
+    }
+
+    const foundUser = await authService.findUserById(Number(userId));
+    if (!foundUser) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "NOT_FOUND",
+            message: "User not found",
+          },
+        },
+        404,
+      );
+    }
+
+    return c.json(
+      {
+        success: true,
+        data: {
+          id: foundUser.id,
+          username: foundUser.username,
+          email: foundUser.email,
+          role: foundUser.role,
+        },
+      },
+      200,
+    );
+  };
+}
