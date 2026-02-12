@@ -49,8 +49,8 @@ export function PostsTable({
   onDelete,
 }: PostsTableProps) {
   return (
-    <div className="border">
-      <Table>
+    <div className="border rounded-md">
+      <Table className="">
         <TableHeader className="bg-card">
           <TableRow>
             <TableHead className="w-20">ID</TableHead>

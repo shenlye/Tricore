@@ -39,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansSC.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansSC.variable}`} suppressHydrationWarning>
       <body className="antialiased scroll-box [text-autospace:normal]">
         <ThemeProvider defaultTheme="dark">
           <Script
