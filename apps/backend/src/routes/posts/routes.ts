@@ -135,3 +135,110 @@ export const deletePostRoute = createRoute({
     500: createErrorResponse("Internal Server Error"),
   },
 });
+
+// 数字花园：添加文章链接
+export const addPostLinkRoute = createRoute({
+  method: "post",
+  path: "/{id}/links",
+  middleware: [authMiddleware, adminMiddleware] as const,
+  security: [{ Bearer: [] }],
+  request: {
+    params: z.object({
+      id: z.coerce.number().openapi({ example: 1 }),
+    }),
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            targetTitle: z.string().openapi({ example: "目标文章标题" }),
+            context: z.string().optional().openapi({ example: "链接上下文说明" }),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      content: {
+        "application/json": {
+          schema: createSuccessSchema(z.object({
+            sourcePostId: z.number(),
+            targetPostId: z.number(),
+            context: z.string().nullable(),
+          })),
+        },
+      },
+      description: "Link created successfully",
+    },
+    400: createErrorResponse("Bad request - Invalid target post or self-linking"),
+    401: createErrorResponse("Unauthorized"),
+    403: createErrorResponse("Forbidden"),
+    404: createErrorResponse("Source post not found"),
+    409: createErrorResponse("Link already exists"),
+    500: createErrorResponse("Internal Server Error"),
+  },
+});
+
+// 数字花园：删除文章链接
+export const removePostLinkRoute = createRoute({
+  method: "delete",
+  path: "/{id}/links/{targetId}",
+  middleware: [authMiddleware, adminMiddleware] as const,
+  security: [{ Bearer: [] }],
+  request: {
+    params: z.object({
+      id: z.coerce.number().openapi({ example: 1 }),
+      targetId: z.coerce.number().openapi({ example: 2 }),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: createSuccessSchema(z.object({ success: z.boolean() })),
+        },
+      },
+      description: "Link removed successfully",
+    },
+    401: createErrorResponse("Unauthorized"),
+    403: createErrorResponse("Forbidden"),
+    404: createErrorResponse("Link not found"),
+    500: createErrorResponse("Internal Server Error"),
+  },
+});
+
+// 数字花园：获取文章的链接关系
+export const getPostLinksRoute = createRoute({
+  method: "get",
+  path: "/{id}/links",
+  request: {
+    params: z.object({
+      id: z.coerce.number().openapi({ example: 1 }),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: createSuccessSchema(z.object({
+            outgoing: z.array(z.object({
+              id: z.number(),
+              title: z.string().nullable(),
+              slug: z.string().nullable(),
+              context: z.string().nullable(),
+            })),
+            incoming: z.array(z.object({
+              id: z.number(),
+              title: z.string().nullable(),
+              slug: z.string().nullable(),
+              context: z.string().nullable(),
+            })),
+          })),
+        },
+      },
+      description: "Retrieve post links",
+    },
+    404: createErrorResponse("Post not found"),
+    500: createErrorResponse("Internal Server Error"),
+  },
+});

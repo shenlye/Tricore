@@ -1,6 +1,6 @@
 import type { DB } from "../db";
 import { count, eq, inArray } from "drizzle-orm";
-import { postsToTags, tags } from "../db/schema";
+import { postsToTags, tags } from "../db/schemas";
 
 class TagService {
   constructor(private db: DB) { }

@@ -3,7 +3,7 @@ import type { CategoryService } from "./categories";
 import type { TagService } from "./tags";
 import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
 import { pinyin } from "pinyin-pro";
-import { posts, postsToTags } from "../db/schema";
+import { postLinks, posts, postsToTags } from "../db/schemas";
 
 export class PostService {
   constructor(
@@ -281,6 +281,106 @@ export class PostService {
       isPublished: post.isPublished,
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt.toISOString(),
+    };
+  }
+
+  // 数字花园：通过标题查找文章
+  async getPostByTitle(title: string) {
+    return await this.db.query.posts.findFirst({
+      where: and(eq(posts.title, title), isNull(posts.deletedAt)),
+    });
+  }
+
+  // 数字花园：添加文章链接
+  async addPostLink(sourcePostId: number, targetPostId: number, context?: string) {
+    const result = await this.db
+      .insert(postLinks)
+      .values({
+        sourcePostId,
+        targetPostId,
+        context: context || null,
+      })
+      .returning();
+
+    // 更新目标文章的 backlinksCount
+    await this.db
+      .update(posts)
+      .set({
+        backlinksCount: sql`${posts.backlinksCount} + 1`,
+      })
+      .where(eq(posts.id, targetPostId));
+
+    return result[0];
+  }
+
+  // 数字花园：删除文章链接
+  async removePostLink(sourcePostId: number, targetPostId: number) {
+    const result = await this.db
+      .delete(postLinks)
+      .where(
+        and(
+          eq(postLinks.sourcePostId, sourcePostId),
+          eq(postLinks.targetPostId, targetPostId),
+        ),
+      )
+      .returning();
+
+    if (result.length > 0) {
+      // 更新目标文章的 backlinksCount
+      await this.db
+        .update(posts)
+        .set({
+          backlinksCount: sql`${posts.backlinksCount} - 1`,
+        })
+        .where(eq(posts.id, targetPostId));
+    }
+
+    return result.length > 0;
+  }
+
+  // 数字花园：获取文章的链接关系
+  async getPostLinks(postId: number) {
+    // 获取出链（当前文章链接到的其他文章）
+    const outgoing = await this.db.query.postLinks.findMany({
+      where: eq(postLinks.sourcePostId, postId),
+      with: {
+        targetPost: {
+          columns: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+    });
+
+    // 获取入链（链接到当前文章的其他文章）
+    const incoming = await this.db.query.postLinks.findMany({
+      where: eq(postLinks.targetPostId, postId),
+      with: {
+        sourcePost: {
+          columns: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+    });
+
+    return {
+      outgoing: outgoing.map(link => ({
+        id: link.targetPost.id,
+        title: link.targetPost.title,
+        slug: link.targetPost.slug,
+        context: link.context,
+      })),
+      incoming: incoming.map(link => ({
+        id: link.sourcePost.id,
+        title: link.sourcePost.title,
+        slug: link.sourcePost.slug,
+        context: link.context,
+      })),
     };
   }
 }

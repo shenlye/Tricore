@@ -1,7 +1,7 @@
 import type { DB } from "../db";
 import { count, eq, or } from "drizzle-orm";
 import { sign } from "hono/jwt";
-import { users } from "../db/schema";
+import { users } from "../db/schemas";
 
 // Web Crypto API based password hashing (PBKDF2)
 const ITERATIONS = 100000;

@@ -1,7 +1,7 @@
 import type { DB } from "../db";
 import { eq } from "drizzle-orm";
 import { pinyin } from "pinyin-pro";
-import { categories } from "../db/schema";
+import { categories } from "../db/schemas";
 
 class CategoryService {
   constructor(private db: DB) { }

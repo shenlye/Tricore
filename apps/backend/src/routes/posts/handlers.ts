@@ -279,3 +279,147 @@ export function createDeletePostHandler(): RouteHandler<typeof routes.deletePost
     );
   };
 }
+
+// 数字花园：添加文章链接
+export function createAddPostLinkHandler(): RouteHandler<typeof routes.addPostLinkRoute, { Bindings: Env }> {
+  return async (c) => {
+    const postService = c.get("postService");
+    const { id } = c.req.valid("param");
+    const { targetTitle, context } = c.req.valid("json");
+
+    // 检查源文章是否存在
+    const sourcePost = await postService.getPostByIdentifier(id, false);
+    if (!sourcePost) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "NOT_FOUND",
+            message: "Source post not found",
+          },
+        },
+        404,
+      );
+    }
+
+    // 通过标题查找目标文章
+    const targetPost = await postService.getPostByTitle(targetTitle);
+    if (!targetPost) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "BAD_REQUEST",
+            message: `Target post with title "${targetTitle}" not found`,
+          },
+        },
+        400,
+      );
+    }
+
+    // 不能链接到自己
+    if (sourcePost.id === targetPost.id) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "BAD_REQUEST",
+            message: "Cannot link a post to itself",
+          },
+        },
+        400,
+      );
+    }
+
+    try {
+      const link = await postService.addPostLink(sourcePost.id, targetPost.id, context);
+      return c.json(
+        {
+          success: true,
+          data: link,
+        },
+        201,
+      );
+    }
+    catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      if (message.includes("UNIQUE")) {
+        return c.json(
+          {
+            success: false,
+            error: {
+              code: "CONFLICT",
+              message: "Link already exists",
+            },
+          },
+          409,
+        );
+      }
+      throw e;
+    }
+  };
+}
+
+// 数字花园：删除文章链接
+export function createRemovePostLinkHandler(): RouteHandler<typeof routes.removePostLinkRoute, { Bindings: Env }> {
+  return async (c) => {
+    const postService = c.get("postService");
+    const { id, targetId } = c.req.valid("param");
+
+    const result = await postService.removePostLink(id, targetId);
+
+    if (!result) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "NOT_FOUND",
+            message: "Link not found",
+          },
+        },
+        404,
+      );
+    }
+
+    return c.json(
+      {
+        success: true,
+        data: { success: true },
+      },
+      200,
+    );
+  };
+}
+
+// 数字花园：获取文章链接关系
+export function createGetPostLinksHandler(): RouteHandler<typeof routes.getPostLinksRoute, { Bindings: Env }> {
+  return async (c) => {
+    const postService = c.get("postService");
+    const { id } = c.req.valid("param");
+
+    // 检查文章是否存在
+    const post = await postService.getPostByIdentifier(id, false);
+    if (!post) {
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "NOT_FOUND",
+            message: "Post not found",
+          },
+        },
+        404,
+      );
+    }
+
+    const links = await postService.getPostLinks(id);
+
+    return c.json(
+      {
+        success: true,
+        data: links,
+      },
+      200,
+    );
+  };
+}

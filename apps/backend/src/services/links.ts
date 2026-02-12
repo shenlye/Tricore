@@ -1,6 +1,6 @@
 import type { DB } from "../db";
 import { asc, count, desc, eq } from "drizzle-orm";
-import { links } from "../db/schema";
+import { links } from "../db/schemas";
 
 export class LinkService {
   constructor(private db: DB) {}

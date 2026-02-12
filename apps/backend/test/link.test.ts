@@ -2,7 +2,7 @@ import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
 import z from "zod";
 import { createDb } from "../src/db";
-import { users } from "../src/db/schema";
+import { users } from "../src/db/schemas";
 import { app } from "../src/index";
 import { createPaginatedSuccessSchema, createSuccessSchema } from "../src/lib/schema";
 import { LinkSchema } from "../src/routes/links/schema";

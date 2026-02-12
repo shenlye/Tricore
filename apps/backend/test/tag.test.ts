@@ -1,7 +1,7 @@
 import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
 import { createDb } from "../src/db";
-import { users } from "../src/db/schema";
+import { users } from "../src/db/schemas";
 import { app } from "../src/index";
 import { hashPassword } from "../src/services/auth";
 

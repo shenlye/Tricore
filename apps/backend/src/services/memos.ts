@@ -1,6 +1,6 @@
 import type { DB } from "../db";
 import { and, count, eq, isNull } from "drizzle-orm";
-import { memos } from "../db/schema";
+import { memos } from "../db/schemas";
 
 export class MemoService {
   constructor(private db: DB) {}
