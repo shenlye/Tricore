@@ -284,13 +284,6 @@ export class PostService {
     };
   }
 
-  // 数字花园：通过标题查找文章
-  async getPostByTitle(title: string) {
-    return await this.db.query.posts.findFirst({
-      where: and(eq(posts.title, title), isNull(posts.deletedAt)),
-    });
-  }
-
   // 数字花园：添加文章链接
   async addPostLink(sourcePostId: number, targetPostId: number, context?: string) {
     const result = await this.db
@@ -382,5 +375,31 @@ export class PostService {
         context: link.context,
       })),
     };
+  }
+
+  // 数字花园：搜索文章（用于链接自动完成）
+  async searchPosts(query: string, limit: number, onlyPublished = true) {
+    const conditions = [
+      isNull(posts.deletedAt),
+      // 使用 LIKE 进行模糊搜索（SQLite 支持）
+      sql`${posts.title} LIKE ${`%${query}%`}`,
+    ];
+
+    if (onlyPublished) {
+      conditions.push(eq(posts.isPublished, true));
+    }
+
+    const results = await this.db.query.posts.findMany({
+      where: and(...conditions),
+      limit,
+      columns: {
+        id: true,
+        title: true,
+        slug: true,
+      },
+      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+    });
+
+    return results;
   }
 }

@@ -285,7 +285,7 @@ export function createAddPostLinkHandler(): RouteHandler<typeof routes.addPostLi
   return async (c) => {
     const postService = c.get("postService");
     const { id } = c.req.valid("param");
-    const { targetTitle, context } = c.req.valid("json");
+    const { targetPostId, context } = c.req.valid("json");
 
     // 检查源文章是否存在
     const sourcePost = await postService.getPostByIdentifier(id, false);
@@ -302,15 +302,15 @@ export function createAddPostLinkHandler(): RouteHandler<typeof routes.addPostLi
       );
     }
 
-    // 通过标题查找目标文章
-    const targetPost = await postService.getPostByTitle(targetTitle);
+    // 检查目标文章是否存在
+    const targetPost = await postService.getPostByIdentifier(targetPostId, false);
     if (!targetPost) {
       return c.json(
         {
           success: false,
           error: {
             code: "BAD_REQUEST",
-            message: `Target post with title "${targetTitle}" not found`,
+            message: `Target post with ID "${targetPostId}" not found`,
           },
         },
         400,
@@ -343,7 +343,13 @@ export function createAddPostLinkHandler(): RouteHandler<typeof routes.addPostLi
     }
     catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      if (message.includes("UNIQUE")) {
+      // SQLite 唯一约束错误 - 检查各种可能的错误信息格式
+      const lowerMessage = message.toLowerCase();
+      if (lowerMessage.includes("unique")
+        || lowerMessage.includes("constraint")
+        || lowerMessage.includes("primary key")
+        || lowerMessage.includes("already exists")
+        || lowerMessage.includes("duplicate")) {
         return c.json(
           {
             success: false,
@@ -355,6 +361,7 @@ export function createAddPostLinkHandler(): RouteHandler<typeof routes.addPostLi
           409,
         );
       }
+      // 重新抛出其他错误
       throw e;
     }
   };
@@ -418,6 +425,44 @@ export function createGetPostLinksHandler(): RouteHandler<typeof routes.getPostL
       {
         success: true,
         data: links,
+      },
+      200,
+    );
+  };
+}
+
+// 数字花园：搜索文章（用于链接自动完成）
+export function createSearchPostsHandler(): RouteHandler<typeof routes.searchPostsRoute, { Bindings: Env }> {
+  return async (c) => {
+    const postService = c.get("postService");
+    const env = validateEnv(c.env);
+    const jwtSecret = env.JWT_SECRET;
+
+    const { q, limit } = c.req.valid("query");
+
+    // 检查是否是管理员（决定是否只返回已发布文章）
+    const authHeader = c.req.header("Authorization");
+    let onlyPublished = true;
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+      try {
+        const payload = await verify(token, jwtSecret, "HS256");
+        if (payload.role === "admin") {
+          onlyPublished = false;
+        }
+      }
+      catch {
+        // Invalid token or not an admin, keep onlyPublished as true
+      }
+    }
+
+    const results = await postService.searchPosts(q, limit, onlyPublished);
+
+    return c.json(
+      {
+        success: true,
+        data: results,
       },
       200,
     );

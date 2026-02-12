@@ -150,7 +150,7 @@ export const addPostLinkRoute = createRoute({
       content: {
         "application/json": {
           schema: z.object({
-            targetTitle: z.string().openapi({ example: "目标文章标题" }),
+            targetPostId: z.number().openapi({ example: 2 }),
             context: z.string().optional().openapi({ example: "链接上下文说明" }),
           }),
         },
@@ -239,6 +239,37 @@ export const getPostLinksRoute = createRoute({
       description: "Retrieve post links",
     },
     404: createErrorResponse("Post not found"),
+    500: createErrorResponse("Internal Server Error"),
+  },
+});
+
+// 数字花园：搜索文章（用于链接自动完成）
+export const searchPostsRoute = createRoute({
+  method: "get",
+  path: "/search",
+  request: {
+    query: z.object({
+      q: z.string().min(1).openapi({ example: "原子", description: "搜索关键词" }),
+      limit: z.coerce.number().int().min(1).max(20).default(10).openapi({
+        example: 10,
+        description: "返回数量限制",
+      }),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: createSuccessSchema(z.array(z.object({
+            id: z.number(),
+            title: z.string().nullable(),
+            slug: z.string().nullable(),
+          }))),
+        },
+      },
+      description: "Search posts by title",
+    },
+    400: createErrorResponse("Invalid search query"),
     500: createErrorResponse("Internal Server Error"),
   },
 });

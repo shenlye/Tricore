@@ -9,6 +9,7 @@ import {
   createGetPostLinksHandler,
   createListPostsHandler,
   createRemovePostLinkHandler,
+  createSearchPostsHandler,
   createUpdatePostHandler,
 } from "./handlers";
 import {
@@ -19,14 +20,17 @@ import {
   getPostRoute,
   listPostsRoute,
   removePostLinkRoute,
+  searchPostsRoute,
   updatePostRoute,
 } from "./routes";
 
 export function createPostsRouter() {
   return new OpenAPIHono<{ Bindings: Env }>({ defaultHook })
-    .openapi(getPostRoute, createGetPostHandler())
+    // 数字花园：搜索文章（必须放在 /:idOrSlug 之前）
+    .openapi(searchPostsRoute, createSearchPostsHandler())
     .openapi(listPostsRoute, createListPostsHandler())
     .openapi(createPostRoute, createCreatePostHandler())
+    .openapi(getPostRoute, createGetPostHandler())
     .openapi(updatePostRoute, createUpdatePostHandler())
     .openapi(deletePostRoute, createDeletePostHandler())
     // 数字花园：文章链接相关路由
