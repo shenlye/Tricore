@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import ChatCarousel from "@/app/(home)/section/ChatCarousel";
 
 const container = {
   hidden: { opacity: 0 },
@@ -27,7 +28,7 @@ const item = {
 
 export default function HeroSection() {
   return (
-    <section className="w-full flex-1 min-h-screen border-b border-border items-center flex p-8 gap-4">
+    <section className="w-full flex-1 min-h-screen border-b border-border items-center flex p-8 gap-4 justify-between">
       <motion.div
         className="flex flex-col h-full justify-center gap-4"
         variants={container}
@@ -53,7 +54,9 @@ export default function HeroSection() {
           &ldquo;我并没有座右铭，这里其实是可以随便改的&rdquo;
         </motion.div>
       </motion.div>
-      <div className="flex-1 h-full min-h-100"></div>
+      <div className="hidden md:block flex-1 h-full min-h-100 max-w-md">
+        <ChatCarousel />
+      </div>
     </section>
   );
 }
