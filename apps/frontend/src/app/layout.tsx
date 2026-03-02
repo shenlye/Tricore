@@ -31,8 +31,8 @@ export default function RootLayout() {
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansSC.variable}`} suppressHydrationWarning>
       <body className="antialiased scroll-box [text-autospace:normal] flex h-screen w-full items-center justify-center bg-zinc-950 text-zinc-100">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">不限期维护</h1>
-          <p className="text-zinc-400">Indefinite Maintenance</p>
+          <h1 className="text-4xl font-bold mb-4">制作动画中...</h1>
+          <p className="text-zinc-400">博客：<a href="https://blog.shenley.top">https://blog.shenley.top</a></p>
         </div>
       </body>
     </html>
